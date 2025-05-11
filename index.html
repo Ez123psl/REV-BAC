@@ -254,39 +254,49 @@
         // For demonstration, I'll include a few questions for the first theme.
         // In a real scenario, this data would be fully populated.
 
-        const quizData = {
-            'histoire-theme1': {
-                title: "Histoire - Thème 1: La Guerre froide (1947-1991)",
-                questions: [
-                    { q: "En quelle année commence la guerre froide ?", o: ["1945", "1947", "1949", "1950"], a: "b" },
-                    { q: "Quelles sont les deux doctrines qui s’opposent en 1947 ?", o: ["Doctrine Monroe et Doctrine Brejnev", "Plan Marshall et Kominform", "Doctrine Truman et Doctrine Jdanov", "Doctrine de l'endiguement et Coexistence pacifique"], a: "c" },
-                    { q: "Qui parle pour la première fois de \"rideau de fer\" en 1946 ?", o: ["Harry Truman", "Joseph Staline", "Winston Churchill", "Charles de Gaulle"], a: "c" },
-                    { q: "Quels pays occupaient l’Allemagne après 1945 ?", o: ["États-Unis, URSS, Chine, Japon", "France, Royaume-Uni, États-Unis, URSS", "Italie, Pologne, Belgique, Pays-Bas", "Seulement les États-Unis et l'URSS"], a: "b" },
-                    { q: "En quelle année l’Allemagne est-elle divisée en deux États ?", o: ["1947", "1948", "1949", "1951"], a: "c" },
-                    { q: "Quels sont les noms complets de la RFA et de la RDA ?", o: ["République Fédérale Allemande et République Démocratique d'Autriche", "Reich Fédéral Allemand et Région Démocratique Allemande", "République Fédérale d’Allemagne et République Démocratique Allemande", "Royaume Fédéral d'Allemagne et RDA de l'Est"], a: "c" },
-                    { q: "Quelle crise oppose les Alliés à l’URSS entre 1948 et 1949 ?", o: ["Crise de Suez", "Blocus de Berlin", "Crise des missiles de Cuba", "Construction du mur de Berlin"], a: "b" },
-                    { q: "Quelle guerre éclate en Asie en 1950 ?", o: ["Guerre du Vietnam", "Guerre d'Indochine", "Guerre de Corée", "Guerre civile chinoise"], a: "c" },
-                    { q: "Quel événement marque une forte tension nucléaire en 1962 ?", o: ["Premier essai nucléaire soviétique", "Crise des missiles de Cuba", "Catastrophe de Tchernobyl", "Bombardement d'Hiroshima"], a: "b" },
-                    { q: "Quels moyens sont utilisés dans la guerre froide ?", o: ["Affrontements militaires directs massifs", "Coopération économique et culturelle intense", "Négociations diplomatiques permanentes", "Propagande, armement, conquête spatiale"], a: "d" },
-                    { q: "Que symbolise le mur de Berlin ?", o: ["L'unité allemande retrouvée", "La division du monde entre deux blocs", "La supériorité technologique de l'Est", "La fin de la Guerre Froide"], a: "b" },
-                    { q: "En quelle année tombe le mur de Berlin ?", o: ["1987", "1989", "1990", "1991"], a: "b" },
-                    { q: "En quelle année l’URSS disparaît-elle ?", o: ["1989", "1990", "1991", "1992"], a: "c" },
-                    { q: "Quelle organisation fondée en 1945 incarne le multilatéralisme ?", o: ["L’OTAN", "Le Pacte de Varsovie", "L’ONU", "La CEE"], a: "c" },
-                    { q: "Que signifie le terme « guerre froide » ?", o: ["Guerre menée dans des régions polaires", "Absence totale de communication", "Guerre avec armes cryogéniques", "Guerre sans affrontement direct entre superpuissances"], a: "d" }
-                ]
-            },
-            // ... Other themes would be populated here similarly ...
-            // For brevity, I will only include the first theme's full data.
-            // You would need to add the other 6 themes with their 15 QCMs each.
-            // Example for another theme (just a couple of questions):
-            'histoire-theme2': {
-                title: "Histoire - Thème 2: Décolonisation et Tiers-Monde",
-                questions: [
-                     { q: "Quel pays devient indépendant du Royaume-Uni en 1947 ?", o: ["L’Égypte", "Le Kenya", "L’Inde", "L'Australie"], a: "c" },
-                     { q: "Quel pays est créé en même temps que l’Inde ?", o: ["Le Bangladesh", "Le Pakistan", "Le Népal", "Ceylan (Sri Lanka)"], a: "b" },
-                    // ... 13 more questions for this theme
-                ]
-            },
+       const quizData = {
+    'histoire-theme1': {
+        title: "Histoire - Thème 1: La Guerre froide (1947-1991)",
+        questions: [
+            { q: "En quelle année commence la guerre froide ?", o: ["1945", "1947", "1949", "1950"], a: "b" },
+            { q: "Quelles sont les deux doctrines qui s’opposent en 1947 ?", o: ["Doctrine Monroe/Brejnev", "Plan Marshall/Kominform", "Doctrine Truman/Jdanov", "Endiguement/Coexistence"], a: "c" },
+            { q: "Qui parle de « rideau de fer » en 1946 ?", o: ["Staline", "Roosevelt", "Churchill", "De Gaulle"], a: "c" },
+            { q: "Quels pays occupent l’Allemagne après 1945 ?", o: ["USA/URSS/Chine", "France/UK/USA/URSS", "Italie/Japon", "USA seuls"], a: "b" },
+            { q: "Année de division de l’Allemagne ?", o: ["1947", "1948", "1949", "1951"], a: "c" },
+            { q: "Noms complets RFA/RDA ?", o: ["Rép. Fédérale Allemande/Rép. Dém. Autrichienne", "Rép. Fédérale d'Allemagne/Rép. Dém. Allemande", "Reich Allemand/RDA", "Allemagne de l'Ouest/Est"], a: "b" },
+            { q: "Crise Alliés vs URSS (1948-49) ?", o: ["Cuba", "Mur de Berlin", "Blocus de Berlin", "Corée"], a: "c" },
+            { q: "Guerre en Asie en 1950 ?", o: ["Vietnam", "Indochine", "Corée", "Afghanistan"], a: "c" },
+            { q: "Événement nucléaire de 1962 ?", o: ["Hiroshima", "Tchernobyl", "Crise des missiles de Cuba", "Essai soviétique"], a: "c" },
+            { q: "Moyens utilisés dans la guerre froide ?", o: ["Batailles directes", "Propagande/armement/espace", "Aide humanitaire", "Cyberattaques"], a: "b" },
+            { q: "Symbole du mur de Berlin ?", o: ["Paix mondiale", "Division Est/Ouest", "Progrès technique", "Fin URSS"], a: "b" },
+            { q: "Chute du mur de Berlin ?", o: ["1987", "1989", "1991", "1993"], a: "b" },
+            { q: "Disparition de l’URSS ?", o: ["1989", "1990", "1991", "1992"], a: "c" },
+            { q: "Organisation multilatérale de 1945 ?", o: ["OTAN", "ONU", "UE", "Pacte Varsovie"], a: "b" },
+            { q: "Définition « guerre froide » ?", o: ["Guerre polaire", "Affrontements indirects", "Guerre informatique", "Conflit médiéval"], a: "b" }
+        ]
+    },
+
+    'histoire-theme2': {
+        title: "Histoire - Thème 2: Décolonisation et Tiers-Monde",
+        questions: [
+            { q: "Indépendance de l'Inde en 1947 contre ?", o: ["France", "Portugal", "Royaume-Uni", "Espagne"], a: "c" },
+            { q: "Pays créé avec l'Inde en 1947 ?", o: ["Bangladesh", "Pakistan", "Sri Lanka", "Népal"], a: "b" },
+            { q: "Conférence des non-alignés (1955) ?", o: ["Yalta", "Bandung", "Potsdam", "Alger"], a: "b" },
+            { q: "Indépendance algérienne de la France ?", o: ["1954", "1958", "1962", "1965"], a: "c" },
+            { q: "Guerre France vs Indochine ?", o: ["1939-1945", "1946-1954", "1954-1962", "1965-1973"], a: "b" },
+            { q: "Mouvement des pays pauvres ?", o: ["Tiers-Monde", "Non-alignés", "G20", "OPEP"], a: "a" },
+            { q: "Symbole de l'apartheid ?", o: ["Angola", "Afrique du Sud", "Rhodésie", "Kenya"], a: "b" },
+            { q: "Pays non-alignés pendant GF ?", o: ["Neutres", "Pro-USA", "Pro-URSS", "Anciennes colonies"], a: "a" },
+            { q: "Organisation pour l'autodétermination ?", o: ["OTAN", "ONU", "UE", "Croix-Rouge"], a: "b" },
+            { q: "Puissance avec guerres décolonisation ?", o: ["UK", "France", "Espagne", "Portugal"], a: "b" },
+            { q: "Accords finissant la guerre d'Algérie ?", o: ["Genève", "Évian", "Versailles", "Oslo"], a: "b" },
+            { q: "Dates guerre d'Algérie ?", o: ["1945-1950", "1954-1962", "1962-1967", "1970-1975"], a: "b" },
+            { q: "Rôle du Tiers-Monde dans GF ?", o: ["Médiateur", "Terrain d'influence", "Fournisseur d'armes", "Isolé"], a: "b" },
+            { q: "Héritages de la colonisation ?", o: ["Démocratie stable", "Inégalités/dépendances", "Développement rapide", "Unité culturelle"], a: "b" },
+            { q: "Moyens d'accès à l'indépendance ?", o: ["Sport/diplomatie", "Négociation/guerre", "Cyberattaques", "Boycott culturel"], a: "b" }
+        ]
+    },
+           
             'geographie-theme1': {
         title: "Géographie - Thème 1: Ressources et Développement Durable",
         questions: [
