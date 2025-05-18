@@ -59,6 +59,5 @@ Des quiz dynamiques, responsive et animés pour tester vos connaissances et cibl
 
 Distribué sous **Licence MIT**. Vous êtes libre de l’utiliser et de l’adapter, à condition de conserver la mention d’auteur.
 
----
 
-> « Bienvenue sur votre espace de révisions du Bac : consolidez vos connaissances grâce à nos quiz interactifs ! »
+
