@@ -3,7 +3,7 @@
 Un projet web “vanilla” (HTML/CSS/JS) pensé pour faciliter les révisions du Bac Pro Systèmes Numériques (SN) et d’autres matières (Histoire, Géographie, EMC, Français).  
 Des quiz dynamiques, responsive et animés pour tester vos connaissances et cibler vos lacunes.
 
-> **En ligne :** https://votre-site-de-quiz.example.com](https://rev-bac.vercel.app/
+> **En ligne :** https://rev-bac.vercel.app/
 
 ---
 
