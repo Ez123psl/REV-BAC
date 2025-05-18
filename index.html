@@ -5,235 +5,244 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Quiz de Révision Interactif Final</title>
   <style>
-    /* ---------- Animation de défilement infini pour la navbar ---------- */
-    @keyframes scrollMenu {
-      0%   { transform: translateX(0); }
-      100% { transform: translateX(-50%); }
+    /* Reset & variables */
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+    :root{
+      --bg:#1f2937; --nav-bg:#111827; --nav-hover:#374151;
+      --text:#f9fafb; --accent:#3b82f6;
+      --sub-bg:#1e293b; --block-bg:#111827;
+      --opt-bg:#1f2937; --opt-hover:#374151;
+      --shadow:rgba(0,0,0,0.3);
     }
-    /* Cache la scrollbar */
-    .menu::-webkit-scrollbar { display: none; }
-    /* Navbar menu déroulant */
-    nav.navbar {
-      background: #2d3748;
-      position: sticky; top: 0; z-index: 1000;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
-    }
-    .menu {
-      display: flex;
-      white-space: nowrap;
-      overflow: hidden;          /* plus de scroll manuel ni barre */
-      animation: scrollMenu 20s linear infinite; /* défilement auto */
-      list-style: none;
-      margin: 0; padding: 0 10px;
-    }
-    .menu-item {
-      position: relative;
-      margin-right: 12px;
-      padding: 8px 16px;
-      color: #e2e8f0;
-      cursor: pointer;
-      transition: background 0.3s;
-    }
-    .menu-item:hover { background: #4a5568; }
-    .submenu {
-      position: absolute; top: 100%; left: 0;
-      background: #222a38;
-      list-style: none;
-      margin-top: 4px; padding: 8px 0;
-      border-radius: 4px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      opacity: 0; transform: translateY(-10px);
-      pointer-events: none;
-      transition: opacity .25s, transform .25s;
-    }
-    .menu-item:hover .submenu {
-      opacity: 1; transform: translateY(0);
-      pointer-events: auto;
-    }
-    .sub-nav-button {
-      display: block; width: 100%; border: none;
-      background: none; color: #cbd5e0;
-      text-align: left; padding: 8px 20px;
-      font-size: 14px; cursor: pointer;
-      transition: background .2s;
-    }
-    .sub-nav-button:hover { background: #3b4759; color: #e2e8f0; }
+    body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text);
+         display:flex;flex-direction:column;min-height:100vh;}
+    a{cursor:pointer;text-decoration:none;color:inherit;}
 
-    /* ---------- Styles globaux ---------- */
-    * { box-sizing: border-box; margin: 0; padding: 0; }
-    body {
-      display: flex; flex-direction: column; min-height: 100vh;
-      background: #1a202c; color: #e2e8f0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    /* Desktop navbar */
+    .navbar{
+      position:sticky;top:0;z-index:1000;
+      background:var(--nav-bg);box-shadow:0 2px 8px var(--shadow);
+      display:flex;justify-content:center;padding:1rem 0;
+    }
+    .nav-button{
+      margin:0 1rem;padding:.75rem 1.5rem;
+      background:none;border:none;color:var(--text);
+      font-size:1rem;border-radius:.5rem;
+      transition:background .3s,color .3s;
+    }
+    .nav-button:hover,
+    .nav-button.active{
+      background:var(--nav-hover);color:var(--accent);
+    }
+    .sub-navbar{
+      max-height:0;overflow:hidden;
+      background:var(--sub-bg);
+      transition:max-height .4s ease,opacity .4s ease;
+      opacity:0;display:flex;justify-content:center;flex-wrap:wrap;
+      box-shadow:0 2px 8px var(--shadow);
+    }
+    .sub-navbar.active{
+      max-height:200px;opacity:1;
+    }
+    .sub-nav-button{
+      margin:.5rem;padding:.5rem 1rem;
+      background:none;border:none;color:var(--text);
+      border-radius:.375rem;transition:background .3s,color .3s;
+    }
+    .sub-nav-button:hover,
+    .sub-nav-button.active{
+      background:var(--nav-hover);color:var(--accent);
     }
 
-    /* ---------- Message de bienvenue ---------- */
-    #welcome-message {
-      background: #2d3748;
-      padding: 30px; border-radius: 8px;
-      text-align: center; font-size: 1.2em;
-      margin: 20px auto; width: 95%; max-width: 1200px;
+    /* Quiz containers */
+    .container{flex:1;width:90%;max-width:900px;margin:2rem auto;padding-top:1rem;}
+    .quiz-container{
+      background:var(--block-bg);border-radius:.75rem;
+      box-shadow:0 4px 12px var(--shadow);
+      padding:2rem;margin-bottom:2rem;display:none;
+    }
+    .quiz-container.active{display:block;}
+    h2.quiz-title{
+      margin-bottom:1.5rem;font-size:1.5rem;
+      color:var(--accent);text-align:center;
+      border-bottom:2px solid var(--opt-bg);padding-bottom:.5rem;
+    }
+    form.questions{display:flex;flex-direction:column;gap:1.5rem;}
+    .question-block{
+      background:var(--opt-bg);border-radius:.5rem;
+      padding:1.5rem;box-shadow:0 2px 8px var(--shadow);
+      display:flex;flex-direction:column;gap:1rem;
+    }
+    .question-text{font-weight:600;font-size:1.1rem;}
+
+    /* ← ici j’ai ajusté le padding pour libérer de l’espace à gauche */
+    .options label{
+      position:relative;display:block;
+      background:var(--bg);border-radius:.375rem;
+      padding:.75rem 1rem .75rem 2.5rem;
+      margin-bottom:.5rem;cursor:pointer;
+      transition:background .2s;
+    }
+    .options label:hover{background:var(--nav-hover);}
+    .options input[type=radio]{display:none;}
+    .options input[type=radio]+label::before{
+      content:'';position:absolute;top:50%;left:1rem;
+      transform:translateY(-50%);width:1rem;height:1rem;
+      border:2px solid var(--accent);border-radius:50%;
+      transition:background .2s;
+    }
+    .options input[type=radio]:checked+label::before{background:var(--accent);}
+    .options input[type=radio]:checked+label{
+      background:var(--nav-hover);font-weight:600;
     }
 
-    /* ---------- Zone des quiz ---------- */
-    #quiz-content-area {
-      flex: 1; display: flex; flex-direction: column;
-      align-items: center; width: 100%;
+    .submit-quiz-button{
+      margin:2rem auto 1rem;display:block;
+      padding:.75rem 2rem;background:var(--accent);
+      color:#111827;border:none;border-radius:.5rem;
+      font-size:1rem;font-weight:600;cursor:pointer;
+      transition:background .3s;
     }
-    .quiz-container {
-      display: none;
-      background: #2d3748; border-radius: 8px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-      margin: 20px 0; padding: 20px;
-      width: 95%; max-width: 1200px;
+    .submit-quiz-button:hover{background:#2563eb;}
+    .results-display{
+      background:var(--opt-bg);padding:1.25rem;
+      border-radius:.5rem;text-align:center;
+      font-size:1.1rem;margin-top:1rem;
+      box-shadow:0 2px 8px var(--shadow);
     }
-    .quiz-container.active { display: block; }
-
-    /* ---------- Titre ---------- */
-    h1 { text-align: center; color: #63b3ed; margin-bottom: 16px; }
-    h2.quiz-title {
-      text-align: center; color: #90cdf4;
-      margin-bottom: 24px; padding-bottom: 8px;
-      border-bottom: 2px solid #4a5568;
+    .feedback{
+      margin-top:.75rem;padding:.5rem;
+      border-radius:.375rem;font-style:italic;
     }
-
-    /* ---------- Grille de questions ---------- */
-    .questions {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(360px, 1fr));
-      gap: 20px;
+    .correct-answer-feedback{
+      background:rgba(52,211,153,0.2);
+      border-left:4px solid #34d399;
+    }
+    .incorrect-answer-feedback{
+      background:rgba(248,113,113,0.2);
+      border-left:4px solid #f87171;
     }
 
-    /* ---------- Bloc question ---------- */
-    .question-block {
-      background: #4a5568; border-radius: 6px;
-      padding: 16px; display: flex; flex-direction: column;
-      justify-content: space-between; min-height: 240px;
-    }
-    .question-text { font-weight: bold; margin-bottom: 12px; }
-    .options {
-      flex: 1; display: flex; flex-direction: column;
-      justify-content: space-around;
-    }
-    .options label {
-      background: #2c3e50; border-radius: 4px;
-      padding: 10px; margin-bottom: 8px;
-      cursor: pointer; transition: background .2s;
-    }
-    .options label:hover { background: #34495e; }
-    .options input[type="radio"] { display: none; }
-    .options label::before {
-      content: ''; display: inline-block;
-      width: 16px; height: 16px; margin-right: 10px;
-      border: 2px solid #63b3ed; border-radius: 50%;
-      vertical-align: middle; transition: background .2s;
-    }
-    .options input:checked + label::before { background: #63b3ed; }
-    .options input:checked + label {
-      background: #2c5282; font-weight: bold;
-    }
-
-    /* ---------- Bouton Valider ---------- */
-    .submit-quiz-button {
-      display: block; margin: 20px auto 0;
-      max-width: 300px; width: 100%;
-      padding: 12px; border: none; border-radius: 5px;
-      background: #63b3ed; color: #1a202c;
-      font-size: 16px; font-weight: bold;
-      cursor: pointer; transition: background .3s;
-    }
-    .submit-quiz-button:hover { background: #4299e1; }
-
-    /* ---------- Résultats et feedback ---------- */
-    .results-display {
-      margin-top: 20px; padding: 20px;
-      background: #4a5568; border-radius: 6px;
-      text-align: center; font-size: 1.2em;
-    }
-    .feedback {
-      margin-top: 8px; padding: 5px;
-      font-style: italic; font-size: 0.9em;
-      border-radius: 3px;
-    }
-    .correct-answer-feedback {
-      background: rgba(104,211,145,0.2);
-      border-left: 3px solid #68d391;
-    }
-    .incorrect-answer-feedback {
-      background: rgba(252,129,129,0.2);
-      border-left: 3px solid #fc8181;
-    }
-    .correct { color: #68d391; }
-    .incorrect { color: #fc8181; }
-
-    /* ---------- Footer ---------- */
-    footer {
-      margin-top: auto; padding: 16px 0;
-      background: #2d3748; color: #a0aec0;
-      text-align: center; font-size: 0.9em;
+    /* Mobile drawer */
+    .nav-toggle,.overlay,nav.drawer{display:none;}
+    @media(max-width:768px){
+      .navbar,.sub-navbar{display:none!important;}
+      .nav-toggle{
+        display:block;position:fixed;top:1rem;left:1rem;
+        font-size:2rem;background:none;border:none;color:var(--text);
+        z-index:1100;cursor:pointer;
+      }
+      .overlay{
+        display:block;position:fixed;inset:0;
+        background:rgba(0,0,0,0.5);opacity:0;
+        transition:opacity .3s;pointer-events:none;z-index:1050;
+      }
+      .overlay.show{opacity:1;pointer-events:auto;}
+      nav.drawer{
+        display:block;position:fixed;top:0;left:0;
+        width:80%;max-width:300px;height:100%;
+        background:var(--nav-bg);
+        transform:translateX(-100%);
+        transition:transform .3s;z-index:1060;
+        overflow-y:auto;padding:1.5rem;
+      }
+      nav.drawer.open{transform:translateX(0);}
+      nav.drawer ul{list-style:none;}
+      nav.drawer li>a{
+        display:block;padding:.75rem;font-size:1rem;
+        border-radius:.375rem;transition:background .2s;
+      }
+      nav.drawer li>a:hover{background:var(--nav-hover);}
+      nav.drawer li ul{display:none;padding-left:1rem;}
+      nav.drawer li.open>ul{display:block;}
+      nav.drawer li ul a{padding:.5rem 0;color:#cbd5e0;}
     }
 
-    /* ---------- Responsive ---------- */
-    @media(max-width:600px) {
-      .question-block { min-height: 260px; }
-      .submit-quiz-button { font-size: 14px; padding: 10px; }
-      .quiz-container { padding: 16px; }
-      h2.quiz-title { margin-bottom: 16px; }
+    footer{
+      background:var(--nav-bg);text-align:center;
+      padding:1rem;color:#9ca3af;font-size:.9rem;
     }
   </style>
 </head>
 <body>
 
-  <!-- NAVBAR -->
-  <nav class="navbar">
-    <ul class="menu">
-      <li class="menu-item">
-        Histoire 🟥
-        <ul class="submenu">
-          <li><button class="sub-nav-button" onclick="showQuiz('histoire-theme1')">Guerre Froide</button></li>
-          <li><button class="sub-nav-button" onclick="showQuiz('histoire-theme2')">Décolonisation</button></li>
+  <!-- Desktop navbar -->
+  <div class="navbar">
+    <button class="nav-button" onclick="toggleSub('histoire-subnav')">Histoire</button>
+    <button class="nav-button" onclick="toggleSub('geographie-subnav')">Géographie</button>
+    <button class="nav-button" onclick="toggleSub('emc-subnav')">EMC</button>
+    <button class="nav-button" onclick="toggleSub('francais-subnav')">Français</button>
+    <button class="nav-button" onclick="toggleSub('sn-subnav')">Bac Pro SN</button>
+  </div>
+  <div id="histoire-subnav" class="sub-navbar">
+    <button class="sub-nav-button" onclick="showQuiz('histoire-theme1')">Guerre Froide</button>
+    <button class="sub-nav-button" onclick="showQuiz('histoire-theme2')">Décolonisation</button>
+  </div>
+  <div id="geographie-subnav" class="sub-navbar">
+    <button class="sub-nav-button" onclick="showQuiz('geographie-theme1')">Ressources & DD</button>
+    <button class="sub-nav-button" onclick="showQuiz('geographie-theme2')">Sociétés & Risques</button>
+  </div>
+  <div id="emc-subnav" class="sub-navbar">
+    <button class="sub-nav-button" onclick="showQuiz('emc-theme1')">Bioéthique</button>
+  </div>
+  <div id="francais-subnav" class="sub-navbar">
+    <button class="sub-nav-button" onclick="showQuiz('francais-oeuvres')">Œuvres</button>
+    <button class="sub-nav-button" onclick="showQuiz('francais-figures')">Figures</button>
+  </div>
+  <div id="sn-subnav" class="sub-navbar">
+    <button class="sub-nav-button" onclick="showQuiz('sn-architecture')">Arch & OS</button>
+    <button class="sub-nav-button" onclick="showQuiz('sn-reseau')">Réseaux & IP</button>
+    <button class="sub-nav-button" onclick="showQuiz('sn-embarque')">Embarqué</button>
+    <button class="sub-nav-button" onclick="showQuiz('sn-cyber')">Cybersécu</button>
+  </div>
+
+  <!-- Mobile drawer -->
+  <button class="nav-toggle" aria-label="Menu mobile">☰</button>
+  <div class="overlay"></div>
+  <nav class="drawer">
+    <ul>
+      <li><a>Histoire</a>
+        <ul>
+          <li><a onclick="selectAndClose('histoire-theme1')">Guerre Froide</a></li>
+          <li><a onclick="selectAndClose('histoire-theme2')">Décolonisation</a></li>
         </ul>
       </li>
-      <li class="menu-item">
-        Géographie 🟦
-        <ul class="submenu">
-          <li><button class="sub-nav-button" onclick="showQuiz('geographie-theme1')">Ressources & DD</button></li>
-          <li><button class="sub-nav-button" onclick="showQuiz('geographie-theme2')">Risques</button></li>
+      <li><a>Géographie</a>
+        <ul>
+          <li><a onclick="selectAndClose('geographie-theme1')">Ressources & DD</a></li>
+          <li><a onclick="selectAndClose('geographie-theme2')">Sociétés & Risques</a></li>
         </ul>
       </li>
-      <li class="menu-item">
-        EMC 🟨
-        <ul class="submenu">
-          <li><button class="sub-nav-button" onclick="showQuiz('emc-theme1')">Bioéthique</button></li>
+      <li><a>EMC</a>
+        <ul>
+          <li><a onclick="selectAndClose('emc-theme1')">Bioéthique</a></li>
         </ul>
       </li>
-      <li class="menu-item">
-        Français 🟥🟦
-        <ul class="submenu">
-          <li><button class="sub-nav-button" onclick="showQuiz('francais-oeuvres')">Œuvres étudiées</button></li>
-          <li><button class="sub-nav-button" onclick="showQuiz('francais-figures')">Figures de style</button></li>
+      <li><a>Français</a>
+        <ul>
+          <li><a onclick="selectAndClose('francais-oeuvres')">Œuvres</a></li>
+          <li><a onclick="selectAndClose('francais-figures')">Figures</a></li>
         </ul>
       </li>
-      <li class="menu-item">
-        Bac Pro SN 🟩
-        <ul class="submenu">
-          <li><button class="sub-nav-button" onclick="showQuiz('sn-architecture')">Architecture & OS</button></li>
-          <li><button class="sub-nav-button" onclick="showQuiz('sn-reseau')">Réseaux & IP</button></li>
-          <li><button class="sub-nav-button" onclick="showQuiz('sn-embarque')">Embarqué</button></li>
-          <li><button class="sub-nav-button" onclick="showQuiz('sn-cyber')">Cybersécurité</button></li>
+      <li><a>Bac Pro SN</a>
+        <ul>
+          <li><a onclick="selectAndClose('sn-architecture')">Arch & OS</a></li>
+          <li><a onclick="selectAndClose('sn-reseau')">Réseaux & IP</a></li>
+          <li><a onclick="selectAndClose('sn-embarque')">Embarqué</a></li>
+          <li><a onclick="selectAndClose('sn-cyber')">Cybersécu</a></li>
         </ul>
       </li>
     </ul>
   </nav>
 
-  <!-- WELCOME -->
-  <div id="welcome-message">
+  <!-- Welcome -->
+  <div id="welcome-message" style="text-align:center;padding:2rem;margin-top:5rem;">
     <h1>Quiz de Révision Interactif</h1>
-    <p>Bienvenue ! Sélectionnez une matière et un thème pour commencer.</p>
+    <p>Bienvenue sur votre espace de révisions du Bac : consolidez vos connaissances grâce à nos quiz interactifs !</p>
   </div>
 
-  <!-- QUIZ CONTENT -->
-  <div id="quiz-content-area">
+  <!-- Quiz area -->
+  <div class="container" id="quiz-content-area">
     <div id="histoire-theme1-quiz" class="quiz-container"></div>
     <div id="histoire-theme2-quiz" class="quiz-container"></div>
     <div id="geographie-theme1-quiz" class="quiz-container"></div>
@@ -247,313 +256,324 @@
     <div id="sn-cyber-quiz" class="quiz-container"></div>
   </div>
 
-  <!-- FOOTER -->
   <footer>
-    <p>© <span id="year"></span> Révisions SN RISC — conçu et maintenu par Pascal</p>
+    <p>© 2025 Révisions SN RISC — par Pascal</p>
   </footer>
 
   <script>
-    /* Met à jour l'année du footer */
-    document.getElementById('year').textContent = new Date().getFullYear();
+    /* Toggle desktop subnav */
+    function toggleSub(id) {
+      document.querySelectorAll('.sub-navbar').forEach(nav=>{
+        nav.id===id ? nav.classList.toggle('active') : nav.classList.remove('active');
+      });
+      document.querySelectorAll('.nav-button').forEach(btn=>{
+        btn.classList.toggle('active', btn.getAttribute('onclick').includes(id));
+      });
+    }
 
-    /* Données de tous les quiz (chacune 15 questions originales) */
+
+  
+    // Données complètes de tous les thèmes
     const quizData = {
       'histoire-theme1': {
-        title: "La Guerre froide (1947-1991)",
+        title: "Histoire - Thème 1: La Guerre froide (1947-1991)",
         questions: [
-          { q:"En quelle année commence la guerre froide ?", o:["1945","1947","1949","1950"], a:"b" },
-          { q:"Qui prononce l’expression « rideau de fer » ?", o:["Staline","Churchill","Roosevelt","De Gaulle"], a:"b" },
-          { q:"Programme d’aide Marshall lancé en ?", o:["1946","1947","1948","1949"], a:"c" },
-          { q:"Blocus de Berlin entre ?", o:["1946-47","1947-48","1948-49","1949-50"], a:"c" },
-          { q:"Date création OTAN ?", o:["1945","1947","1949","1951"], a:"c" },
-          { q:"Doctrine Jdanov = riposte de l’URSS à ?", o:["Plan Marshall","Truman","Monroe","Churchill"], a:"a" },
-          { q:"Crise des missiles de Cuba date de ?", o:["1960","1961","1962","1963"], a:"c" },
-          { q:"Discours Khrouchtchev à l’ONU en ?", o:["1955","1956","1957","1958"], a:"b" },
-          { q:"Conférénce de Yalta a eu lieu en ?", o:["1943","1944","1945","1946"], a:"a" },
-          { q:"Mur de Berlin érigé en ?", o:["1958","1959","1960","1961"], a:"d" },
-          { q:"Chute du mur de Berlin en ?", o:["1987","1988","1989","1990"], a:"c" },
-          { q:"Traité de Varsovie signé en ?", o:["1948","1950","1955","1960"], a:"c" },
-          { q:"Course à l’espace gagnée par ?", o:["USA","URSS","UK","France"], a:"b" },
-          { q:"Premier homme dans l’espace ?", o:["Gagarine","Armstrong","Titov","Shepard"], a:"a" },
-          { q:"Fin officielle de l’URSS en ?", o:["1990","1991","1992","1993"], a:"b" }
+          { q: "En quelle année commence la guerre froide ?", o: ["1945","1947","1949","1950"], a: "b" },
+          { q: "Quelles doctrines s’opposent en 1947 ?", o: ["Monroe/Brejnev","Marshall/Kominform","Truman/Jdanov","Endiguement/Coexistence"], a: "c" },
+          { q: "Qui parle de « rideau de fer » en 1946 ?", o: ["Staline","Roosevelt","Churchill","De Gaulle"], a: "c" },
+          { q: "Quels pays occupent l'Allemagne après 1945 ?", o: ["USA/URSS/Chine","France/UK/USA/URSS","Italie/Japon","USA seuls"], a: "b" },
+          { q: "Année de la division officielle de l’Allemagne ?", o: ["1947","1948","1949","1951"], a: "c" },
+          { q: "Signification RFA/RDA ?", o: ["Fédérale Astro/Alpine","Fédérale d'Allemagne/Démocratique Allemande","Reich Allemand/RDA","Ouest/Est"], a: "b" },
+          { q: "Quelle crise en 1948-49 ?", o: ["Cuba","Mur de Berlin","Blocus de Berlin","Corée"], a: "c" },
+          { q: "Quelle guerre en Asie en 1950 ?", o: ["Vietnam","Indochine","Corée","Afghanistan"], a: "c" },
+          { q: "Événement nucléaire de 1962 ?", o: ["Hiroshima","Tchernobyl","Crise des missiles de Cuba","Essai soviétique"], a: "c" },
+          { q: "Moyens de la guerre froide ?", o: ["Batailles directes","Propagande/armement/espace","Aide humanitaire","Cyberattaques"], a: "b" },
+          { q: "Symbole du mur de Berlin ?", o: ["Paix mondiale","Division Est/Ouest","Progrès technique","Fin URSS"], a: "b" },
+          { q: "Chute du mur de Berlin ?", o: ["1987","1989","1991","1993"], a: "b" },
+          { q: "Disparition de l’URSS ?", o: ["1989","1990","1991","1992"], a: "c" },
+          { q: "Organisation multilatérale fondée en 1945 ?", o: ["OTAN","ONU","UE","Pacte Varsovie"], a: "b" },
+          { q: "Définition de « guerre froide » ?", o: ["Guerre polaire","Affrontements indirects","Guerre informatique","Conflit médiéval"], a: "b" }
         ]
       },
       'histoire-theme2': {
-        title: "Décolonisation & Tiers-Monde",
+        title: "Histoire - Thème 2: Décolonisation et Tiers-Monde",
         questions: [
-          { q:"Indépendance de l’Inde en ?", o:["1945","1947","1949","1951"], a:"b" },
-          { q:"Partition de l’Inde mène à la création de ?", o:["Bangladesh","Pakistan","Sri Lanka","Népal"], a:"b" },
-          { q:"Conférence de Bandung en ?", o:["1950","1953","1955","1958"], a:"c" },
-          { q:"Fin guerre d’Algérie en ?", o:["1958","1960","1962","1964"], a:"c" },
-          { q:"Accords d’Évian signés en ?", o:["1961","1962","1963","1964"], a:"b" },
-          { q:"Tiers-Monde désigne les pays ?", o:["Industrialistes","Non alignés","Colonisateurs","Développés"], a:"b" },
-          { q:"Création de l’OPEP en ?", o:["1958","1960","1962","1964"], a:"b" },
-          { q:"Premier pays africain indépendant ?", o:["Ghana","Nigeria","Kenya","Algérie"], a:"a" },
-          { q:"Rôle ONU dans décolonisation ?", o:["Armée","Médiation","Sanctions","Élections"], a:"b" },
-          { q:"Mouvement des non-alignés fondé en ?", o:["1955","1957","1959","1961"], a:"a" },
-          { q:"Fin du protectorat français au Vietnam en ?", o:["1953","1954","1955","1956"], a:"b" },
-          { q:"Pays sud-africain oppressif ?", o:["Kenya","Zimbabwe","Afrique du Sud","Angola"], a:"c" },
-          { q:"Discours « Nous ne reviendrons jamais en arrière » ?", o:["Kennedy","Gandhi","De Gaulle","Nasser"], a:"b" },
-          { q:"Indépendance du Congo belge en ?", o:["1958","1959","1960","1961"], a:"c" },
-          { q:"Processus pacifique de décolonisation :", o:["Guerre","Négociation","Armistice","Annexion"], a:"b" }
+          { q: "Indépendance de l'Inde en 1947 contre ?", o: ["France","Portugal","Royaume-Uni","Espagne"], a: "c" },
+          { q: "Pays créé avec l'Inde en 1947 ?", o: ["Bangladesh","Pakistan","Sri Lanka","Népal"], a: "b" },
+          { q: "Conférence des non-alignés (1955) ?", o: ["Yalta","Bandung","Potsdam","Alger"], a: "b" },
+          { q: "Indépendance algérienne de la France en ?", o: ["1954","1958","1962","1965"], a: "c" },
+          { q: "Guerre France vs Indochine ?", o: ["1939-45","1946-54","1954-62","1965-73"], a: "b" },
+          { q: "Mouvement des pays pauvres ?", o: ["Tiers-Monde","Non-alignés","G20","OPEP"], a: "a" },
+          { q: "Symbole de l’apartheid ?", o: ["Angola","Afrique du Sud","Rhodésie","Kenya"], a: "b" },
+          { q: "Pays non-alignés = ?", o: ["Neutres","Pro-USA","Pro-URSS","Anciennes colonies"], a: "a" },
+          { q: "Organisation pour l'autodétermination ?", o: ["OTAN","ONU","UE","Croix-Rouge"], a: "b" },
+          { q: "Puissance décoloniale majeure ?", o: ["UK","France","Espagne","Portugal"], a: "b" },
+          { q: "Accords fin conflit algérien ?", o: ["Genève","Évian","Versailles","Oslo"], a: "b" },
+          { q: "Dates de la guerre d'Algérie ?", o: ["1945-50","1954-62","1962-67","70-75"], a: "b" },
+          { q: "Rôle du Tiers-Monde GF ?", o: ["Médiateur","Terrain d'influence","Fournisseur d'armes","Isolé"], a: "b" },
+          { q: "Héritages de la colonisation ?", o: ["Démocratie stable","Inégalités/dépendances","Dév rapide","Unité culturelle"], a: "b" },
+          { q: "Accès à l'indépendance ?", o: ["Sport/diplomatie","Négociation/guerre","Cyberattaques","Boycott culturel"], a: "b" }
         ]
       },
       'geographie-theme1': {
-        title: "Ressources & Développement Durable",
+        title: "Géographie - Thème 1: Ressources & Développement Durable",
         questions: [
-          { q:"Qu’est-ce qu’une ressource ?", o:["Produit fini","Service","Élément exploité","Technologie"], a:"c" },
-          { q:"Part de l’eau pour agriculture ?", o:["30%","50%","70%","90%"], a:"c" },
-          { q:"Ressource clé mal répartie ?", o:["Pétrole","Charbon","Eau","Gaz"], a:"c" },
-          { q:"Fleuve tensionnel entre 7 États ?", o:["Nil","Amazone","Colorado","Gange"], a:"a" },
-          { q:"Mode d’agriculture durable ?", o:["Intensive","Monoculture","Agroécologie","Hydroponie"], a:"c" },
-          { q:"Sécurité alimentaire = ?", o:["Exporter","Réduire coûts","Accès équitable","DDOS"], a:"c" },
-          { q:"Changement climatique → faim via ?", o:["Déflation","Sècheresse","Surpop","Pandémie"], a:"b" },
-          { q:"Exemple liaison santé-environ.", o:["Sida","Covid","Grippe","Ebola"], a:"b" },
-          { q:"Plantes économes en eau ?", o:["Cactus","Tropi","Agrumes","Pommes"], a:"a" },
-          { q:"Aménagement anti-évap.", o:["Barrages","Canaux couverts","Serres","Irrigation"], a:"b" },
-          { q:"Politique anti-gaspill.", o:["Taxes","Redistribution","Subventions","OGM"], a:"b" },
-          { q:"Agroécologie réduit ?", o:["Pesticides","Eau","Sol","CO₂"], a:"a" },
-          { q:"Parc français DD ?", o:["Calanques","Yellowstone","Serengeti","Banff"], a:"a" },
-          { q:"Définition DD ?", o:["Exploiter max","Croissance","Présent+futur","Protéger luxe"], a:"c" },
-          { q:"3 piliers DD ?", o:["Pol/Eco/Soc","Tech/Cult/Env","Eco/Soc/Env","Agri/Indus"], a:"c" }
+          { q: "Qu'est-ce qu'une ressource ?", o: ["Produit manufacturé","Service économique","Élément naturel","Technologie"], a: "c" },
+          { q: "Pourcentage d'eau pour l'agriculture ?", o: ["30%","50%","70%","90%"], a: "c" },
+          { q: "Ressource mal répartie ?", o: ["Pétrole","Charbon","Eau","Gaz naturel"], a: "c" },
+          { q: "Fleuve tendu entre 7 États ?", o: ["Nil","Amazone","Colorado","Yangzi"], a: "c" },
+          { q: "Agriculture durable ?", o: ["Intensive","Monoculture","Bio/agroéco","Hydroponie"], a: "c" },
+          { q: "Sécurité alimentaire vise ?", o: ["Exporter","Réduire coût","Accès équitable","Développer OGM"], a: "c" },
+          { q: "Phénomène aggravant la faim ?", o: ["Déflation","Climat","Surpopulation","Pandémies"], a: "b" },
+          { q: "Virus lien santé-environ ?", o: ["Ebola","VIH","Covid-19","Espagnole"], a: "c" },
+          { q: "Plantes économes en eau ?", o: ["Cactus","Tropicales","Peu gourmandes","Céréales"], a: "c" },
+          { q: "Aménagement anti-évaporation ?", o: ["Barrages","Canaux couvert","Pivots","Serres"], a: "b" },
+          { q: "Politique anti-gaspillage ?", o: ["Subventions","Interdiction export","Redistribution","Taxes"], a: "c" },
+          { q: "Pratique anti-pesticide ?", o: ["OGM","Agroéco","Labour","Robotique"], a: "b" },
+          { q: "Parc durable exemple ?", o: ["Yellowstone","Calanques","Serengeti","Banff"], a: "b" },
+          { q: "Définition dev durable ?", o: ["Croissance rapide","Exploitation max","Répondre sans compromettre","Protection seule"], a: "c" },
+          { q: "3 piliers dev durable ?", o: ["Politique/Éco/Social","Techno/Culturel/Enviro","Éco/Social/Enviro","Indus/Agri/Urbain"], a: "c" }
         ]
       },
       'geographie-theme2': {
-        title: "Sociétés Face aux Risques",
+        title: "Géographie - Thème 2: Sociétés & Risques",
         questions: [
-          { q:"Aléa = ?", o:["Conséquence","Phénomène","Prévention","Résultat"], a:"b" },
-          { q:"Enjeu = ?", o:["Cause","Élément menacé","Solution","Analyse"], a:"b" },
-          { q:"Risque = ?", o:["Aléa+Enjeu","Aléa–Prévent","Enjeu×Coût","Aléa÷Prev"], a:"a" },
-          { q:"Vulnérabilité = ?", o:["Résist","Fragilité","Adaptation","Ressource"], a:"b" },
-          { q:"Ex risque naturel ?", o:["Explosion","Séisme","Cyber","Incendie"], a:"b" },
-          { q:"Ex risque techno ?", o:["Ouragan","Tsunami","Lubrizol","Séisme"], a:"c" },
-          { q:"Risque systémique ?", o:["Local","En chaîne","Théorique","Calculé"], a:"b" },
-          { q:"Ex système en chaîne ?", o:["Inondation","Séisme→Tsu","Coupure","Pollution"], a:"b" },
-          { q:"Pays pauvres vulnérables ?", o:["Climat","Moyens","Aléas","Surpop"], a:"b" },
-          { q:"Plan secours FR ?", o:["Vigipirate","ORSEC","Neptune","Éclipse"], a:"b" },
-          { q:"PPMS signifie ?", o:["Stocks","Sûreté","Maladies","Protection"], a:"b" },
-          { q:"Alerte en cas de ?", o:["Radio","Sirènes","Bulletins","SMS"], a:"b" },
-          { q:"Aménagement inondations ?", o:["Éoliennes","Diguettes","Serres","Tunnels"], a:"b" },
-          { q:"Acteurs gestion ?", o:["États","Citoyens","ONG","Tous"], a:"d" },
-          { q:"Axes de gestion ?", o:["Prev/Repress","Prev/Adapt","Anal/Comm","Prev/Adapt/Crise"], a:"d" }
+          { q: "Qu'est-ce qu'un aléa ?", o: ["Conséq catast.","Phénomène pot","Prévention","Résultat"], a: "b" },
+          { q: "Qu'est-ce qu'un enjeu ?", o: ["Cause","Élément menacé","Solution","Analyse"], a: "b" },
+          { q: "Formule du risque ?", o: ["Aléa+Enjeux","Aléa−Vuln","Enjeux×Coût","Aléa/Prévent"], a: "a" },
+          { q: "Vulnérabilité = ?", o: ["Résistance","Fragilité","Adaptation","Ressources"], a: "b" },
+          { q: "Ex de risque naturel ?", o: ["Usine","Séisme","Marée noire","Cyber"], a: "b" },
+          { q: "Ex risque technologique ?", o: ["Ouragan","Glissement","Lubrizol","Épidémie"], a: "c" },
+          { q: "Risque systémique ?", o: ["Localisé","En chaîne","Calculé","Théorique"], a: "b" },
+          { q: "Ex système en chaîne ?", o: ["Inondation","Séisme→Tsu→Nucléaire","Sécheresse","Feu"], a: "b" },
+          { q: "Pays pauvres vulnérables pourquoi ?", o: ["Climat","Moyens","Aléas","Pop"], a: "b" },
+          { q: "Plan secours France ?", o: ["Vigipirate","ORSEC","Neptune","Éclipse"], a: "b" },
+          { q: "PPMS signifie ?", o: ["Mgmt stocks","Mise en sûreté","Prévent maladies","Prot milieux"], a: "b" },
+          { q: "Moyen d'alerte ?", o: ["Radio","Sirènes","Météo","Sondage"], a: "b" },
+          { q: "Aménagement anti-inondation ?", o: ["Éoliennes","Diguettes","Panneaux","Tunnels"], a: "b" },
+          { q: "Acteurs gestion risque ?", o: ["États","Citoyens","ONG","Tous"], a: "d" },
+          { q: "3 axes gestion ?", o: ["Prévention/Rép/Recons","Prévision/Adapt/Rép","Prévention/Adapt/Crisis","Analyse/Intercom"], a: "c" }
         ]
       },
       'emc-theme1': {
-        title: "Défis de Société & Bioéthique",
+        title: "EMC - Défis de Société & Bioéthique",
         questions: [
-          { q:"Accords Paris en ?", o:["2012","2015","2018","2020"], a:"b" },
-          { q:"PMA signifie ?", o:["Animale","Assistée","Alim","Ordre"], a:"b" },
-          { q:"Bioéthique = ?", o:["Écosystèmes","Modif vivant","Agriculture","Coutume"], a:"b" },
-          { q:"GPA autorisée ?", o:["Oui","Non","Hét","Etr"], a:"b" },
-          { q:"Détox numérique = ?", o:["#MeToo","Gilets","Détox","XR"], a:"c" },
-          { q:"Rôle COP ?", o:["Tourisme","Climat","Commerce","Santé"], a:"b" },
-          { q:"RGPD protège ?", o:["Réseaux","Données","PROTO","Énergie"], a:"b" },
-          { q:"2FA = ?", o:["Double auth","SMS","Mail","App"], a:"a" },
-          { q:"Clonage soignant ?", o:["Oui","Non","Étude","Théorie"], a:"b" },
-          { q:"Éthique CRISPR ?", o:["Toujours","Jamais","Sous cond","Public"], a:"c" },
-          { q:"Choix TVA ?", o:["Éco","Socio","Éthique","Tech"], a:"c" },
-          { q:"Bioéthique question principale ?", o:["Progrès","Droits","Argent","Anim"], a:"b" },
-          { q:"Pharmacie durable ?", o:["OGM","Green chem","Synthèse","Nuit"], a:"b" },
-          { q:"Tests sur cellules ?", o:["Animaux","Cell culture","In vivo","Intuition"], a:"b" },
-          { q:"Transplantation éthique ?", o:["Consentement","Pulvérisation","Vol","Lot"], a:"a" }
+          { q: "Année COP21 (Paris) ?", o: ["2012","2015","2018","2020"], a: "b" },
+          { q: "Objectif fondamental ?", o: ["Terrorisme","Réduire GES","Nucléaire","OGM"], a: "b" },
+          { q: "Signification PMA ?", o: ["Médicale Animale","Med Assistée","Mondial Alim","Maintien Ordre"], a: "b" },
+          { q: "PMA pour toutes depuis ?", o: ["2010","2015","2020","Jamais"], a: "c" },
+          { q: "Signification GPA ?", o: ["Pub Agricole","Pour Autrui","Prot Animale","Prix Annuel"], a: "b" },
+          { q: "GPA en France ?", o: ["Oui cond","Non","Hétéros","Étranger"], a: "b" },
+          { q: "Cyclone Batsirai impact ?", o: ["Aucun","Matériel","Humains+Matériel","Éco"], a: "c" },
+          { q: "Bioéthique définit ?", o: ["Écosystèmes","Modif vivant","Droit animal","Agri"], a: "b" },
+          { q: "MFA signifie ?", o: ["Monnaie","Multi-factor","Manu-flex","None"], a: "b" },
+          { q: "Ex mouvement climat ?", o: ["Ext_pressure","Acc Paris","G20","UNESCO"], a: "b" },
+          { q: "Numérique détox pour ?", o: ["Argent","Simplicité","Virus","Perf"], a: "b" },
+          { q: "Enjeu majeur bioéthique ?", o: ["Science","Droits vs société","Éco","Animaux"], a: "b" },
+          { q: "Rôle COP ?", o: ["Pandémie","Commerce","Climat","Tourisme"], a: "c" },
+          { q: "Ex protocol climat ?", o: ["OTAN","Acc Paris","G20","UE"], a: "b" },
+          { q: "Objet poétique bioéthique ?", o: ["Vie","Corps","Nature","None"], a: "b" }
         ]
       },
       'francais-oeuvres': {
-        title: "Œuvres Étudiées",
+        title: "Français - Œuvres Étudiées",
         questions: [
-          { q:"Auteur « Le Petit Prince » ?", o:["Verne","StEx","Camus","Hugo"], a:"b" },
-          { q:"Thème « L’Étranger » ?", o:["Absurde","Amour","Guerre","Aventure"], a:"a" },
-          { q:"Narration « Germinal » ?", o:["1ère","2e","3e","4e"], a:"c" },
-          { q:"Genre « 1984 » ?", o:["Utopie","Dystopie","Roman","Poème"], a:"b" },
-          { q:"Héros « Les Mis » ?", o:["Marius","Valjean","Javert","Cosette"], a:"b" },
-          { q:"Auteur « Bovary » ?", o:["Balzac","Flaubert","Zola","Maupassant"], a:"b" },
-          { q:"Style Camus ?", o:["Minimaliste","Baroque","Romantique","Lyrique"], a:"a" },
-          { q:"Époque « Bel-Ami » ?", o:["20e","19e","21e","18e"], a:"b" },
-          { q:"Thème « Antigone » ?", o:["Justice","Amour","Guerre","Politique"], a:"a" },
-          { q:"Langue Shakespeare ?", o:["Anglais","Français","Latin","Grec"], a:"a" },
-          { q:"Genre « Le Cid » ?", o:["Tragédie","Comédie","Roman","Poésie"], a:"a" },
-          { q:"Poète « Demain dès l’aube » ?", o:["Lamartine","Hugo","Verlaine","Rimbaud"], a:"a" },
-          { q:"Courant « Fleurs du Mal » ?", o:["Symbolisme","Romantisme","Classicisme","Baroque"], a:"a" },
-          { q:"Auteur « Candide » ?", o:["Voltaire","Diderot","Rousseau","Montesquieu"], a:"a" },
-          { q:"Thème « La Peste » ?", o:["Épidémie","Amour","Aventure","Philosophie"], a:"a" }
+          { q: "Aliénation ouvrier dans Temps modernes ?", o: ["Keaton","Chaplin","Tati","Funès"], a: "b" },
+          { q: "Critique sociale dans Hommes lents ?", o: ["Admin","Modernité","Pollution","Inégalités"], a: "b" },
+          { q: "Héros de « Courir » ?", o: ["Bolt","Zatopek","Mimoun","Mo Farah"], a: "b" },
+          { q: "Genre « Courir » ?", o: ["Historique","Biographie","SF","Théâtre"], a: "b" },
+          { q: "Thème « La Vraie vie » ?", o: ["Amour","Violence","Espace","Enquête"], a: "b" },
+          { q: "Narration « La Vraie vie » ?", o: ["3ᵉ","Journal","1ʳᵉ","Témoignage"], a: "c" },
+          { q: "Détox numérique pourquoi ?", o: ["Argent","Simplicité","Virus","Perf"], a: "b" },
+          { q: "Parfum des fleurs… type ?", o: ["Auto","Fantasy","Polar","Essai"], a: "a" },
+          { q: "Lieu principal Parfum… ?", o: ["Venise","Lyon","BN","Stade"], a: "a" },
+          { q: "Départ « Tout le bleu… » ?", o: ["Mariage","Diag","Road trip","Job"], a: "c" },
+          { q: "Ton « Tout le bleu… » ?", o: ["Comique","Mélancolique","Horreur","Suspense"], a: "b" },
+          { q: "Œuvre anti-aliénation numérique ?", o: ["Temps modernes","Good Morning","Vraie vie","Courir"], a: "b" },
+          { q: "Lien Good Morning/Détox ?", o: ["Critique","Dépendance","Écologie","Sport"], a: "b" },
+          { q: "Émotion Temps modernes ?", o: ["Peur","Colère","Honte","Humour"], a: "d" },
+          { q: "Problématique commune ?", o: ["Déshumanisation","Amour","Guerre","Renaissance"], a: "a" }
         ]
       },
       'francais-figures': {
-        title: "Figures de Style",
+        title: "Français - Figures de Style",
         questions: [
-          { q:"« Joie violente » est ?", o:["Oxymore","Hyperbole","Métaphore","Comparaison"], a:"a" },
-          { q:"Personnification attribue ?", o:["Humain à obj","Animal","Concept","Lieu"], a:"a" },
-          { q:"Anaphore = ?", o:["Rép début","Gradation","Chiasme","Ellipse"], a:"a" },
-          { q:"Accumulation = ?", o:["Liste","Anaphore","Parataxe","Chiasme"], a:"a" },
-          { q:"Ironie = ?", o:["Dire l’inverse","Exagérer","Minimiser","Comparer"], a:"a" },
-          { q:"Litote = ?", o:["Atténuer","Exagérer","Comparer","Opposer"], a:"a" },
-          { q:"Antithèse = ?", o:["Opposer idées","Opp sons","Opp ritme","Opp sens"], a:"a" },
-          { q:"Parallélisme = ?", o:["Structures","Sons","Mots","Idées"], a:"a" },
-          { q:"Chiasme = ?", o:["ABBA","AABB","ABAB","BBAA"], a:"a" },
-          { q:"Euphémisme = ?", o:["Atténuation","Amplification","Négation","Ironie"], a:"a" },
-          { q:"Hyperbole = ?", o:["Exagération","Minimisation","Atténuation","Neutralité"], a:"a" },
-          { q:"Métaphore = ?", o:["Sans 'comme'","Avec 'comme'","",""], a:"a" },
-          { q:"Comparaison = ?", o:["Avec 'comme'","Sans","Figuré","Direct"], a:"a" },
-          { q:"Allitération = ?", o:["Rép consonnes","Rép voyelles","Rép mots","Rép phrases"], a:"a" },
-          { q:"Paronyme = ?", o:["Mots sons proches","Sens proches","Orthographe","Famille"], a:"a" }
+          { q: "\"Joie violente\" est un… ?", o: ["Oxymore","Métaphore","Hyperbole","Comparaison"], a: "a" },
+          { q: "Attribution humaine à machine ?", o: ["Allégorie","Personnification","Métonymie","Litote"], a: "b" },
+          { q: "Répétitions sensorielles ?", o: ["Accumulation","Anaphore","Gradation","Parallélisme"], a: "a" },
+          { q: "Image symbole idée ?", o: ["Allégorie","Euphémisme","Antithèse","Synecdoque"], a: "a" },
+          { q: "Gestes mécaniques répétés ?", o: ["Anaphore","Climax","Énumération","Hyperbole"], a: "a" },
+          { q: "\"Il courait comme…\" est… ?", o: ["Métaphore","Comparaison","Allitération","Antiphrase"], a: "b" },
+          { q: "Dire l'inverse ironique ?", o: ["Litote","Antiphrase","Oxymore","Chiasme"], a: "b" },
+          { q: "\"Pas très tendre\" litote ?", o: ["Hyperbole","Litote","Métaphore","Comparaison"], a: "b" },
+          { q: "Nature qui écoute ?", o: ["Allégorie","Personnification","Métonymie","Synecdoque"], a: "b" },
+          { q: "Série mots courts ?", o: ["Gradation","Énumération","Anaphore","Parataxe"], a: "b" },
+          { q: "Associer plusieurs sens ?", o: ["Synesthésie","Métaphore","Allitération","Hyperbole"], a: "a" },
+          { q: "\"Le silence hurlait\" est… ?", o: ["Oxymore+Perso","Compar+Grad","Litote+Euph","Métaph+Allit"], a: "a" },
+          { q: "\"Ce n’était pas rien\" est… ?", o: ["Hyperbole","Litote","Antiphrase","Euphémisme"], a: "b" },
+          { q: "Phrases débutant pareil ?", o: ["Gradation","Anaphore","Parallélisme","Chiasme"], a: "b" },
+          { q: "Transformation poétique d'objet ?", o: ["Métaphore","Comparaison","Synecdoque","Allégorie"], a: "a" }
         ]
       },
       'sn-architecture': {
-        title: "Bac Pro SN – Architecture & OS",
+        title: "Bac Pro SN - Architecture & OS",
         questions: [
-          { q:"Composant exécute ?", o:["RAM","SSD","CPU","GPU"], a:"c" },
-          { q:"Mémoire volatile ?", o:["ROM","EEPROM","RAM","Flash"], a:"c" },
-          { q:"Stockage rapide ?", o:["HDD","CD","SSD NVMe","USB"], a:"c" },
-          { q:"Rôle BIOS ?", o:["Lancer OS","Config","Init mat","Sauvegarde"], a:"c" },
-          { q:"UEFI signifie ?", o:["User EFI","Unified EFI Intf","Universal","Ultra"], a:"b" },
-          { q:"Interface HDD ?", o:["USB","PCI","SATA","HDMI"], a:"c" },
-          { q:"Bus I2C pour ?", o:["PCI","SATA","USB","Capteurs"], a:"d" },
-          { q:"OS CLI ?", o:["Win","Linux","macOS","Android"], a:"b" },
-          { q:"Commande ls ?", o:["List","Change","Remove","Kill"], a:"a" },
-          { q:"Mode noyau = ?", o:["User","Kernel","Safe","UEFI"], a:"b" },
-          { q:"Boot à froid ?", o:["Reboot","Cold","Warm","Fast"], a:"b" },
-          { q:"CISC vs RISC?", o:["Complexe","Simple","Lent","Cher"], a:"b" },
-          { q:"Hyperviseur type1 ?", o:["Hôte OS","Bare-metal","VM","BIOS"], a:"b" },
-          { q:"Firmware stocké en ?", o:["RAM","ROM","CPU","GPU"], a:"b" },
-          { q:"Registre PC pointe sur ?", o:["Instr","Stack","Heap","Data"], a:"a" }
+          { q: "Quel composant exécute les instructions ?", o: ["RAM","SSD","CPU","GPU"], a: "c" },
+          { q: "Quelle mémoire est volatile ?", o: ["ROM","EEPROM","RAM","Flash"], a: "c" },
+          { q: "Stockage le plus rapide ?", o: ["HDD","CD-ROM","SSD NVMe","USB"], a: "c" },
+          { q: "Rôle du BIOS ?", o: ["Lancer OS","Config réseau","Init matos","Gérer fichiers"], a: "c" },
+          { q: "UEFI signifie ?", o: ["Universal EFI","Unified Extensible Firmware Interface","Ultra Easy FI","User EFI"], a: "b" },
+          { q: "Interface disque dur ?", o: ["USB","PCI","SATA","HDMI"], a: "c" },
+          { q: "Bus capteurs I2C ?", o: ["PCI","SATA","USB","I2C"], a: "d" },
+          { q: "OS en CLI ?", o: ["Windows","Linux","MacOS","Android"], a: "b" },
+          { q: "Commande lister fichiers ?", o: ["cd","ls","rm","ps"], a: "b" },
+          { q: "Mode accès total ?", o: ["Utilisateur","Noyau","Safe","UEFI"], a: "b" }
         ]
       },
       'sn-reseau': {
-        title: "Bac Pro SN – Réseaux & IP",
+        title: "Bac Pro SN - Réseaux & IP",
         questions: [
-          { q:"Couches OSI ?", o:["4","5","6","7"], a:"d" },
-          { q:"Couche IP ?", o:["Liaison","Réseau","Transp","App"], a:"b" },
-          { q:"IP privée ?", o:["192.168.x.x","8.8.8.8","127.0.0.1","224.0.0.1"], a:"a" },
-          { q:"FTP sécurisé ?", o:["FTP","SCP","SFTP","HTTP"], a:"c" },
-          { q:"Switch fait ?", o:["Routeur","Switch","Modem","FW"], a:"b" },
-          { q:"Port HTTPS ?", o:["80","443","21","22"], a:"b" },
-          { q:"Wi-Fi ax =", o:["g","n","ac","ax"], a:"d" },
-          { q:"Masque IP sert à ?", o:["Ports","Segmenter","Chiffrer","Filtrer"], a:"b" },
-          { q:"DHCP attribue ?", o:["IP","MAC","DNS","Ports"], a:"a" },
-          { q:"DNS résout ?", o:["IP→Nom","Nom→IP","MAC→IP","Port→App"], a:"b" },
-          { q:"TCP vs UDP ?", o:["Fiable","Non fiable","Chiffré","Verrouillé"], a:"a" },
-          { q:"ICMP sert à ?", o:["Ping","Mail","FTP","SSH"], a:"a" },
-          { q:"Routeur couche ?", o:["2","3","4","5"], a:"b" },
-          { q:"VLAN isolent ?", o:["LAN","WAN","PAN","MAN"], a:"a" },
-          { q:"VPN tunnel via ?", o:["HTTP","IPSec","FTP","DNS"], a:"b" }
+          { q: "Couches du modèle OSI ?", o: ["4","5","6","7"], a: "d" },
+          { q: "Couche IP appartient ?", o: ["Liaison","Réseau","Transport","Applica"], a: "b" },
+          { q: "IP privée IPv4 exemple ?", o: ["192.168.0.1","8.8.8.8","172.0.0.1","255.255.255.0"], a: "a" },
+          { q: "Transfert sécurisé de fichier ?", o: ["FTP","SCP","SFTP","HTTP"], a: "c" },
+          { q: "Matériel pour commutation ?", o: ["Routeur","Switch","Modem","Firewall"], a: "b" },
+          { q: "Protocole port 443 ?", o: ["HTTP","HTTPS","FTP","SSH"], a: "b" },
+          { q: "Norme Wi-Fi la plus récente ?", o: ["802.11g","802.11n","802.11ac","802.11ax"], a: "d" },
+          { q: "Utilité masque sous-réseau ?", o: ["Ports","Diviser réseau","Sécurité","VLAN"], a: "b" },
+          { q: "Protocole DHCP ?", o: ["DNS","SSH","DHCP","ICMP"], a: "c" },
+          { q: "Protocole DNS fait… ?", o: ["FTP","DHCP","DNS","ARP"], a: "c" }
         ]
       },
       'sn-embarque': {
-        title: "Bac Pro SN – Systèmes Embarqués",
+        title: "Bac Pro SN - Systèmes Embarqués",
         questions: [
-          { q:"MCU = ?", o:["Proc+RAM","Disk","Alim","Écran"], a:"a" },
-          { q:"Module IoT populaire ?", o:["Arduino","ESP32","Raspberry","Intel"], a:"b" },
-          { q:"GPIO signifie ?", o:["Entrée/Sortie","Bus","PWM","ADC"], a:"a" },
-          { q:"Protocole 4 fils ?", o:["UART","SPI","I2C","CAN"], a:"b" },
-          { q:"Langage Arduino ?", o:["Python","Bash","C/C++","Java"], a:"c" },
-          { q:"Capteur DHT11 mesure ?", o:["Distance","Temp+Hum","Lumière","Mouvement"], a:"b" },
-          { q:"Protocole IoT léger ?", o:["MQTT","FTP","SMTP","NTP"], a:"a" },
-          { q:"Boost converter augmente ?", o:["Tension","Courant","Puissance","Impédance"], a:"a" },
-          { q:"ADC convertit ?", o:["Ana→Num","Num→Ana","PWM","UART"], a:"a" },
-          { q:"IDE MicroPython ?", o:["Arduino","Thonny","VSCode","Eclipse"], a:"b" },
-          { q:"PWM sert à ?", o:["Contrôle vitesse","Lecture ana","Stockage","Chiffrage"], a:"a" },
-          { q:"CAN bus = ?", o:["Auto","Audio","Vidéo","Ethernet"], a:"a" },
-          { q:"STM32 arch ?", o:["ARM","x86","MIPS","PowerPC"], a:"a" },
-          { q:"JTAG pour ?", o:["Debug","Stockage","Chiffrage","Moniteur"], a:"a" },
-          { q:"RTOS = ?", o:["Real-Time","Robust","Remote","Random"], a:"a" }
+          { q: "Qu’est-ce qu’un microcontrôleur ?", o: ["CPU+RAM intégrées","Disque dur","Alim","Écran"], a: "a" },
+          { q: "Microcontrôleur IoT ?", o: ["Arduino","ESP32","Raspberry Pi","Intel i5"], a: "b" },
+          { q: "Pins numériques ?", o: ["ADC","PWM","GPIO","I2C"], a: "c" },
+          { q: "Protocole rapide 4 fils ?", o: ["UART","SPI","I2C","Wi-Fi"], a: "b" },
+          { q: "Langage Arduino ?", o: ["Python","Bash","C/C++","Java"], a: "c" },
+          { q: "Capteur température populaire ?", o: ["PIR","DHT11","LDR","L298N"], a: "b" },
+          { q: "Protocole IoT ?", o: ["MQTT","FTP","NTP","SMTP"], a: "a" },
+          { q: "Convertisseur augmente tension ?", o: ["Buck","Boost","Linéaire","EEPROM"], a: "b" },
+          { q: "Outil lire valeur analogique ?", o: ["PWM","ADC","DAC","UART"], a: "b" },
+          { q: "IDE Python ESP32 ?", o: ["Arduino","PyCharm","Thonny","MicroPython"], a: "d" }
         ]
       },
       'sn-cyber': {
-        title: "Bac Pro SN – Cybersécurité",
+        title: "Bac Pro SN - Cybersécurité",
         questions: [
-          { q:"Ransomware fait ?", o:["Espion","Chiffre+rançon","Supprime","Copie"], a:"b" },
-          { q:"HTTPS repose sur ?", o:["SSL/TLS","FTP","SSH","ICMP"], a:"a" },
-          { q:"DDoS = ?", o:["SQL","DDoS","XSS","Phish"], a:"b" },
-          { q:"Outil capture paquets ?", o:["Wireshark","Nmap","Tracer","Antivirus"], a:"a" },
-          { q:"VPN protocole ?", o:["IPSec","SMTP","DHCP","DNS"], a:"a" },
-          { q:"IDS détecte ?", o:["Virus","Intrusion","Spam","Fail"], a:"b" },
-          { q:"MFA = ?", o:["2FA","SMS","OAuth","LDAP"], a:"a" },
-          { q:"Chiffrage asymétrique ?", o:["2 clés","1 clé","Hash","Salt"], a:"a" },
-          { q:"Phishing cible ?", o:["ID","App","OS","Hardware"], a:"a" },
-          { q:"RGPD concerne ?", o:["Données persos","Réseaux","Proto","HW"], a:"a" },
-          { q:"XSS attaque ?", o:["JS inj","SQL","DDoS","Phish"], a:"a" },
-          { q:"CSRF protège via ?", o:["Token","SSL","MAC","DNS"], a:"a" },
-          { q:"Hash MD5 = ?", o:["Obsolète","Sûr","Symétrique","Asym"], a:"a" },
-          { q:"Salt sert à ?", o:["Renforcer hash","Chiffrer","Compresser","Stocker"], a:"a" },
-          { q:"PenTest = ?", o:["Audit","Scan","Backup","Patch"], a:"a" }
+          { q: "Logiciel chiffre fichiers pour rançon ?", o: ["Spyware","Trojan","Ransomware","Worm"], a: "c" },
+          { q: "Protocole chiffrement web ?", o: ["HTTP","FTP","TLS","ICMP"], a: "c" },
+          { q: "Ex attaque réseau ?", o: ["SQL","DDoS","XSS","Hash"], a: "b" },
+          { q: "Outil analyse trames ?", o: ["Wireshark","Antivirus","Nmap","Traceroute"], a: "a" },
+          { q: "Protocole VPN ?", o: ["DNS","IPSec","SMTP","DHCP"], a: "b" },
+          { q: "Système détecte intrusion ?", o: ["UEFI","RAID","IDS","ACL"], a: "c" },
+          { q: "Mot de passe sûr ?", o: ["Court","Identique","Long&Unique","Nom famille"], a: "c" },
+          { q: "Chiffrement 2 clés ?", o: ["Symétrique","Asymétrique","Hash","AES"], a: "b" },
+          { q: "Phishing = ?", o: ["Analyse","Simulation","Usurpation identité","Privé"], a: "c" },
+          { q: "RGPD = ?", o: ["Réseau Privé","Règlement Gén. Protection Données","Réseau Prot.","Règle Protocoles"], a: "b" }
         ]
       }
     };
 
-    /* Construction dynamique des quiz */
-    function buildQuizzes() {
-      for (let id in quizData) {
-        const container = document.getElementById(id + '-quiz');
-        let html = `<h2 class="quiz-title">${quizData[id].title}</h2>`;
-        html += `<div class="questions"><form id="${id}-form">`;
-        quizData[id].questions.forEach((q,i) => {
-          const name = `${id}-q${i+1}`;
-          html += `
-            <div class="question-block">
-              <p class="question-text">${i+1}. ${q.q}</p>
-              <div class="options">
-                <input type="radio" id="${name}-a" name="${name}" value="a">
-                <label for="${name}-a">a) ${q.o[0]}</label>
-                <input type="radio" id="${name}-b" name="${name}" value="b">
-                <label for="${name}-b">b) ${q.o[1]}</label>
-                <input type="radio" id="${name}-c" name="${name}" value="c">
-                <label for="${name}-c">c) ${q.o[2]}</label>
-                ${q.o[3] ? `
-                  <input type="radio" id="${name}-d" name="${name}" value="d">
-                  <label for="${name}-d">d) ${q.o[3]}</label>` : ''}
-              </div>
-            </div>`;
+     // Construction dynamique des quiz
+    function buildQuizzes(){
+      for(let id in quizData){
+        const cont=document.getElementById(id+'-quiz'),
+              data=quizData[id];
+        let html=`<h2 class="quiz-title">${data.title}</h2>
+                  <form id="${id}-form" class="questions">`;
+        data.questions.forEach((q,i)=>{
+          const name=`${id}-q${i+1}`;
+          html+=`<div class="question-block">
+                    <p class="question-text">${i+1}. ${q.q}</p>
+                    <div class="options">`;
+          ['a','b','c','d'].forEach(l=>{
+            const idx=l.charCodeAt(0)-97;
+            if(q.o[idx]!==undefined) html+=
+              `<input type="radio" id="${name}-${l}" name="${name}" value="${l}">
+               <label for="${name}-${l}">${l}) ${q.o[idx]}</label>`;
+          });
+          html+=`</div></div>`;
         });
-        html += `</form></div>`;
-        html += `<button class="submit-quiz-button" onclick="submitQuiz('${id}')">Valider le quiz</button>`;
-        html += `<div id="${id}-results" class="results-display" style="display:none;"></div>`;
-        container.innerHTML = html;
+        html+=`<button type="button" class="submit-quiz-button" onclick="submitQuiz('${id}')">
+                  Valider le Quiz
+                </button>
+                <div id="${id}-results" class="results-display" style="display:none;"></div>
+                </form>`;
+        cont.innerHTML=html;
       }
     }
-    document.addEventListener('DOMContentLoaded', buildQuizzes);
-
-    /* Affiche le quiz sélectionné */
-    function showQuiz(id) {
-      document.getElementById('welcome-message').style.display = 'none';
-      document.querySelectorAll('.quiz-container').forEach(c => c.classList.remove('active'));
-      document.getElementById(id + '-quiz').classList.add('active');
-      window.scrollTo({ top: 0, behavior: 'smooth' });
+    function showQuiz(id){
+      document.getElementById('welcome-message').style.display='none';
+      document.querySelectorAll('.quiz-container').forEach(c=>c.classList.remove('active'));
+      document.getElementById(id+'-quiz').classList.add('active');
+      window.scrollTo({top:0,behavior:'smooth'});
     }
 
-    /* Soumission et calcul du score */
-    function submitQuiz(id) {
-      const form = document.getElementById(id + '-form');
-      const results = document.getElementById(id + '-results');
-      let score = 0;
-      quizData[id].questions.forEach((q,i) => {
-        const name = `${id}-q${i+1}`;
-        const sel = form.querySelector(`input[name="${name}"]:checked`);
-        const user = sel ? sel.value : null;
-        const block = sel
-          ? sel.closest('.question-block')
-          : form.querySelector(`input[name="${name}"]`).closest('.question-block');
-        const fb = document.createElement('p');
+    /* Mobile drawer */
+    const drawer=document.querySelector('nav.drawer'),
+          overlay=document.querySelector('.overlay'),
+          toggleBtn=document.querySelector('.nav-toggle');
+    toggleBtn.addEventListener('click',()=>{
+      drawer.classList.toggle('open');
+      overlay.classList.toggle('show');
+    });
+    overlay.addEventListener('click',()=>{
+      drawer.classList.remove('open');
+      overlay.classList.remove('show');
+    });
+    document.querySelectorAll('nav.drawer > ul > li > a').forEach(a=>{
+      a.addEventListener('click',e=>{
+        e.preventDefault();
+        const li=a.parentNode;
+        li.classList.toggle('open');
+        document.querySelectorAll('nav.drawer > ul > li')
+                .forEach(other=>{ if(other!==li) other.classList.remove('open'); });
+      });
+    });
+    function selectAndClose(id){
+      showQuiz(id);
+      drawer.classList.remove('open');
+      overlay.classList.remove('show');
+    }
+
+    /* Submit & feedback */
+    function submitQuiz(id){
+      const data=quizData[id],
+            form=document.getElementById(id+'-form'),
+            res=document.getElementById(id+'-results');
+      let score=0, total=data.questions.length;
+      form.querySelectorAll('.feedback').forEach(f=>f.remove());
+      data.questions.forEach((q,i)=>{
+        const name=`${id}-q${i+1}`,
+              sel=form.querySelector(`input[name="${name}"]:checked`),
+              block=form.querySelector(`input[name="${name}"]`).closest('.question-block'),
+              fb=document.createElement('div');
         fb.classList.add('feedback');
-        if (user === q.a) {
-          score++;
-          fb.innerHTML = '<strong class="correct">Correct !</strong>';
-          fb.classList.add('correct-answer-feedback');
+        if(sel && sel.value===q.a){
+          score++; fb.textContent='✓ Correct'; fb.classList.add('correct-answer-feedback');
         } else {
-          const txt = q.o[q.a.charCodeAt(0) - 97];
-          fb.innerHTML = `<strong class="incorrect">Incorrect.</strong> Bonne réponse : <strong>${q.a.toUpperCase()}) ${txt}</strong>`;
+          const idx=q.a.charCodeAt(0)-97;
+          fb.innerHTML=`✗ Incorrect : <strong>${q.a.toUpperCase()}) ${q.o[idx]}</strong>`;
           fb.classList.add('incorrect-answer-feedback');
         }
         block.appendChild(fb);
       });
-      let msg = `Votre score : ${score} / ${quizData[id].questions.length}.<br>`;
-      if (score === quizData[id].questions.length) msg += "Excellent 🎉";
-      else if (score >= quizData[id].questions.length * 0.7) msg += "Très bien 👍";
-      else if (score >= quizData[id].questions.length * 0.5) msg += "Pas mal 😊";
-      else msg += "À revoir 💪";
-      results.innerHTML = msg;
-      results.style.display = 'block';
-      results.scrollIntoView({ behavior: 'smooth' });
+      const pct=score/total,
+            msg=`Votre score : ${score}/${total}. `+
+                (pct===1?'🎉 Sans faute !':pct>=0.7?'👍 Très bon !':pct>=0.5?'😊 Pas mal':'💪 À revoir'),
+            sug=pct<0.5?'Revoir le thème puis ':'Relire puis ';
+      res.innerHTML=`<p>${msg}</p>
+                     <p class="feedback">${sug}
+                       <a href="#" onclick="showQuiz('${id}')">reprendre le quiz</a>.
+                     </p>`;
+      res.style.display='block';
+      res.scrollIntoView({behavior:'smooth'});
     }
+
+    document.addEventListener('DOMContentLoaded',buildQuizzes);
   </script>
 </body>
 </html>
