@@ -3,201 +3,226 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Quiz de Révision Interactif Final</title>
+  <title>Quiz de Révision Interactif Bac Pro SN</title>
   <style>
     /* Reset & variables */
-    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
-    :root{
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
       --bg:#1f2937; --nav-bg:#111827; --nav-hover:#374151;
       --text:#f9fafb; --accent:#3b82f6;
       --sub-bg:#1e293b; --block-bg:#111827;
       --opt-bg:#1f2937; --opt-hover:#374151;
       --shadow:rgba(0,0,0,0.3);
     }
-    body{font-family:'Segoe UI',sans-serif;background:var(--bg);color:var(--text);
-         display:flex;flex-direction:column;min-height:100vh;}
-    a{cursor:pointer;text-decoration:none;color:inherit;}
-
-    /* Desktop navbar */
-    .navbar{
-      position:sticky;top:0;z-index:1000;
-      background:var(--nav-bg);box-shadow:0 2px 8px var(--shadow);
-      display:flex;justify-content:center;padding:1rem 0;
+    body {
+      font-family:'Segoe UI',sans-serif;
+      background:var(--bg);
+      color:var(--text);
+      display:flex;
+      flex-direction:column;
+      min-height:100vh;
     }
-    .nav-button{
-      margin:0 1rem;padding:.75rem 1.5rem;
-      background:none;border:none;color:var(--text);
-      font-size:1rem;border-radius:.5rem;
-      transition:background .3s,color .3s;
+    a { text-decoration:none; color:inherit; cursor:pointer; }
+
+    /* Sticky navbar + subnav */
+    .navbar-wrapper {
+      position:sticky; top:0; z-index:1000;
+    }
+    .navbar {
+      background:var(--nav-bg);
+      box-shadow:0 2px 8px var(--shadow);
+      display:flex; justify-content:center;
+      padding:1rem 0;
+    }
+    .nav-button {
+      margin:0 1rem; padding:.75rem 1.5rem;
+      background:none; border:none;
+      color:var(--text); font-size:1rem;
+      border-radius:.5rem; transition:background .3s,color .3s;
     }
     .nav-button:hover,
-    .nav-button.active{
-      background:var(--nav-hover);color:var(--accent);
+    .nav-button.active {
+      background:var(--nav-hover); color:var(--accent);
     }
-    .sub-navbar{
-      max-height:0;overflow:hidden;
+    .sub-navbar {
       background:var(--sub-bg);
-      transition:max-height .4s ease,opacity .4s ease;
-      opacity:0;display:flex;justify-content:center;flex-wrap:wrap;
+      display:flex; justify-content:center; flex-wrap:wrap;
+      overflow:hidden; max-height:0; opacity:0;
+      transition:max-height .4s,opacity .4s;
       box-shadow:0 2px 8px var(--shadow);
     }
-    .sub-navbar.active{
-      max-height:200px;opacity:1;
+    .sub-navbar.active {
+      max-height:200px; opacity:1;
     }
-    .sub-nav-button{
-      margin:.5rem;padding:.5rem 1rem;
-      background:none;border:none;color:var(--text);
-      border-radius:.375rem;transition:background .3s,color .3s;
+    .sub-nav-button {
+      margin:.5rem; padding:.5rem 1rem;
+      background:none; border:none; color:var(--text);
+      border-radius:.375rem; transition:background .3s,color .3s;
     }
     .sub-nav-button:hover,
-    .sub-nav-button.active{
-      background:var(--nav-hover);color:var(--accent);
+    .sub-nav-button.active {
+      background:var(--nav-hover); color:var(--accent);
     }
 
     /* Quiz containers */
-    .container{flex:1;width:90%;max-width:900px;margin:2rem auto;padding-top:1rem;}
-    .quiz-container{
-      background:var(--block-bg);border-radius:.75rem;
+    .container {
+      flex:1; width:90%; max-width:900px;
+      margin:2rem auto; padding-top:1rem;
+    }
+    .quiz-container {
+      background:var(--block-bg);
+      border-radius:.75rem;
       box-shadow:0 4px 12px var(--shadow);
-      padding:2rem;margin-bottom:2rem;display:none;
+      padding:2rem; margin-bottom:2rem;
+      display:none;
     }
-    .quiz-container.active{display:block;}
-    h2.quiz-title{
-      margin-bottom:1.5rem;font-size:1.5rem;
-      color:var(--accent);text-align:center;
-      border-bottom:2px solid var(--opt-bg);padding-bottom:.5rem;
+    .quiz-container.active { display:block; }
+    h2.quiz-title {
+      margin-bottom:1.5rem; font-size:1.5rem;
+      color:var(--accent); text-align:center;
+      border-bottom:2px solid var(--opt-bg);
+      padding-bottom:.5rem;
     }
-    form.questions{display:flex;flex-direction:column;gap:1.5rem;}
-    .question-block{
-      background:var(--opt-bg);border-radius:.5rem;
-      padding:1.5rem;box-shadow:0 2px 8px var(--shadow);
-      display:flex;flex-direction:column;gap:1rem;
+    form.questions {
+      display:flex; flex-direction:column; gap:1.5rem;
     }
-    .question-text{font-weight:600;font-size:1.1rem;}
-
-    /* ← ici j’ai ajusté le padding pour libérer de l’espace à gauche */
-    .options label{
-      position:relative;display:block;
-      background:var(--bg);border-radius:.375rem;
-      padding:.75rem 1rem .75rem 2.5rem;
-      margin-bottom:.5rem;cursor:pointer;
-      transition:background .2s;
+    .question-block {
+      background:var(--opt-bg);
+      border-radius:.5rem; padding:1.5rem;
+      box-shadow:0 2px 8px var(--shadow);
+      display:flex; flex-direction:column; gap:1rem;
     }
-    .options label:hover{background:var(--nav-hover);}
-    .options input[type=radio]{display:none;}
-    .options input[type=radio]+label::before{
-      content:'';position:absolute;top:50%;left:1rem;
-      transform:translateY(-50%);width:1rem;height:1rem;
-      border:2px solid var(--accent);border-radius:50%;
-      transition:background .2s;
+    .question-text { font-weight:600; font-size:1.1rem; }
+    .options label {
+      position:relative; display:block;
+      background:var(--bg); border-radius:.375rem;
+      padding:.75rem 1rem; margin-bottom:.5rem;
+      cursor:pointer; transition:background .2s;
     }
-    .options input[type=radio]:checked+label::before{background:var(--accent);}
-    .options input[type=radio]:checked+label{
-      background:var(--nav-hover);font-weight:600;
+    .options label:hover { background:var(--nav-hover); }
+    .options input[type=radio] { display:none; }
+    .options input[type=radio] + label::before {
+      content:''; position:absolute; top:50%; left:1rem;
+      transform:translateY(-50%);
+      width:1rem; height:1rem;
+      border:2px solid var(--accent);
+      border-radius:50%; transition:background .2s;
     }
-
-    .submit-quiz-button{
-      margin:2rem auto 1rem;display:block;
-      padding:.75rem 2rem;background:var(--accent);
-      color:#111827;border:none;border-radius:.5rem;
-      font-size:1rem;font-weight:600;cursor:pointer;
+    .options input[type=radio]:checked + label::before {
+      background:var(--accent);
+    }
+    .options input[type=radio]:checked + label {
+      background:var(--nav-hover); font-weight:600;
+    }
+    .submit-quiz-button {
+      margin:2rem auto 1rem; display:block;
+      padding:.75rem 2rem; background:var(--accent);
+      color:#111827; border:none; border-radius:.5rem;
+      font-size:1rem; font-weight:600; cursor:pointer;
       transition:background .3s;
     }
-    .submit-quiz-button:hover{background:#2563eb;}
-    .results-display{
-      background:var(--opt-bg);padding:1.25rem;
-      border-radius:.5rem;text-align:center;
-      font-size:1.1rem;margin-top:1rem;
+    .submit-quiz-button:hover { background:#2563eb; }
+    .results-display {
+      background:var(--opt-bg); padding:1.25rem;
+      border-radius:.5rem; text-align:center;
+      font-size:1.1rem; margin-top:1rem;
       box-shadow:0 2px 8px var(--shadow);
     }
-    .feedback{
-      margin-top:.75rem;padding:.5rem;
-      border-radius:.375rem;font-style:italic;
+    .feedback {
+      margin-top:.75rem; padding:.5rem;
+      border-radius:.375rem; font-style:italic;
     }
-    .correct-answer-feedback{
+    .correct-answer-feedback {
       background:rgba(52,211,153,0.2);
       border-left:4px solid #34d399;
     }
-    .incorrect-answer-feedback{
+    .incorrect-answer-feedback {
       background:rgba(248,113,113,0.2);
       border-left:4px solid #f87171;
     }
 
     /* Mobile drawer */
-    .nav-toggle,.overlay,nav.drawer{display:none;}
-    @media(max-width:768px){
-      .navbar,.sub-navbar{display:none!important;}
-      .nav-toggle{
-        display:block;position:fixed;top:1rem;left:1rem;
-        font-size:2rem;background:none;border:none;color:var(--text);
-        z-index:1100;cursor:pointer;
+    .nav-toggle, .overlay, nav.drawer { display:none; }
+    @media(max-width:768px) {
+      .navbar-wrapper { display:none; }
+      .nav-toggle {
+        display:block; position:fixed; top:1rem; left:1rem;
+        font-size:2rem; background:none; border:none;
+        color:var(--text); z-index:1100; cursor:pointer;
       }
-      .overlay{
-        display:block;position:fixed;inset:0;
-        background:rgba(0,0,0,0.5);opacity:0;
-        transition:opacity .3s;pointer-events:none;z-index:1050;
+      .overlay {
+        display:block; position:fixed; inset:0;
+        background:rgba(0,0,0,0.5); opacity:0;
+        transition:opacity .3s; pointer-events:none;
+        z-index:1050;
       }
-      .overlay.show{opacity:1;pointer-events:auto;}
-      nav.drawer{
-        display:block;position:fixed;top:0;left:0;
-        width:80%;max-width:300px;height:100%;
+      .overlay.show { opacity:1; pointer-events:auto; }
+      nav.drawer {
+        display:block; position:fixed; top:0; left:0;
+        width:80%; max-width:300px; height:100%;
         background:var(--nav-bg);
         transform:translateX(-100%);
-        transition:transform .3s;z-index:1060;
-        overflow-y:auto;padding:1.5rem;
+        transition:transform .3s; z-index:1060;
+        overflow-y:auto; padding:1.5rem;
       }
-      nav.drawer.open{transform:translateX(0);}
-      nav.drawer ul{list-style:none;}
-      nav.drawer li>a{
-        display:block;padding:.75rem;font-size:1rem;
-        border-radius:.375rem;transition:background .2s;
+      nav.drawer.open { transform:translateX(0); }
+      nav.drawer ul { list-style:none; }
+      nav.drawer li > a {
+        display:block; padding:.75rem 0; font-size:1rem;
+        border-bottom:1px solid rgba(255,255,255,0.1);
       }
-      nav.drawer li>a:hover{background:var(--nav-hover);}
-      nav.drawer li ul{display:none;padding-left:1rem;}
-      nav.drawer li.open>ul{display:block;}
-      nav.drawer li ul a{padding:.5rem 0;color:#cbd5e0;}
+      nav.drawer li.open > ul { display:block; }
+      nav.drawer li ul {
+        display:none; padding-left:1rem;
+      }
+      nav.drawer li ul a {
+        display:block; padding:.5rem 0; color:#cbd5e0;
+      }
     }
 
-    footer{
-      background:var(--nav-bg);text-align:center;
-      padding:1rem;color:#9ca3af;font-size:.9rem;
+    /* Footer */
+    footer {
+      background:var(--nav-bg); text-align:center;
+      padding:1rem; color:#9ca3af; font-size:.9rem;
     }
   </style>
 </head>
 <body>
 
-  <!-- Desktop navbar -->
-  <div class="navbar">
-    <button class="nav-button" onclick="toggleSub('histoire-subnav')">Histoire</button>
-    <button class="nav-button" onclick="toggleSub('geographie-subnav')">Géographie</button>
-    <button class="nav-button" onclick="toggleSub('emc-subnav')">EMC</button>
-    <button class="nav-button" onclick="toggleSub('francais-subnav')">Français</button>
-    <button class="nav-button" onclick="toggleSub('sn-subnav')">Bac Pro SN</button>
-  </div>
-  <div id="histoire-subnav" class="sub-navbar">
-    <button class="sub-nav-button" onclick="showQuiz('histoire-theme1')">Guerre Froide</button>
-    <button class="sub-nav-button" onclick="showQuiz('histoire-theme2')">Décolonisation</button>
-  </div>
-  <div id="geographie-subnav" class="sub-navbar">
-    <button class="sub-nav-button" onclick="showQuiz('geographie-theme1')">Ressources & DD</button>
-    <button class="sub-nav-button" onclick="showQuiz('geographie-theme2')">Sociétés & Risques</button>
-  </div>
-  <div id="emc-subnav" class="sub-navbar">
-    <button class="sub-nav-button" onclick="showQuiz('emc-theme1')">Bioéthique</button>
-  </div>
-  <div id="francais-subnav" class="sub-navbar">
-    <button class="sub-nav-button" onclick="showQuiz('francais-oeuvres')">Œuvres</button>
-    <button class="sub-nav-button" onclick="showQuiz('francais-figures')">Figures</button>
-  </div>
-  <div id="sn-subnav" class="sub-navbar">
-    <button class="sub-nav-button" onclick="showQuiz('sn-architecture')">Arch & OS</button>
-    <button class="sub-nav-button" onclick="showQuiz('sn-reseau')">Réseaux & IP</button>
-    <button class="sub-nav-button" onclick="showQuiz('sn-embarque')">Embarqué</button>
-    <button class="sub-nav-button" onclick="showQuiz('sn-cyber')">Cybersécu</button>
+  <!-- Sticky navbar + subnav -->
+  <div class="navbar-wrapper">
+    <div class="navbar">
+      <button class="nav-button" onclick="toggleSub('histoire-subnav')">Histoire</button>
+      <button class="nav-button" onclick="toggleSub('geographie-subnav')">Géographie</button>
+      <button class="nav-button" onclick="toggleSub('emc-subnav')">EMC</button>
+      <button class="nav-button" onclick="toggleSub('francais-subnav')">Français</button>
+      <button class="nav-button" onclick="toggleSub('sn-subnav')">Bac Pro SN</button>
+    </div>
+    <div id="histoire-subnav" class="sub-navbar">
+      <button class="sub-nav-button" onclick="showQuiz('histoire-theme1')">Guerre Froide</button>
+      <button class="sub-nav-button" onclick="showQuiz('histoire-theme2')">Décolonisation</button>
+    </div>
+    <div id="geographie-subnav" class="sub-navbar">
+      <button class="sub-nav-button" onclick="showQuiz('geographie-theme1')">Ressources & DD</button>
+      <button class="sub-nav-button" onclick="showQuiz('geographie-theme2')">Sociétés & Risques</button>
+    </div>
+    <div id="emc-subnav" class="sub-navbar">
+      <button class="sub-nav-button" onclick="showQuiz('emc-theme1')">Bioéthique</button>
+    </div>
+    <div id="francais-subnav" class="sub-navbar">
+      <button class="sub-nav-button" onclick="showQuiz('francais-oeuvres')">Œuvres</button>
+      <button class="sub-nav-button" onclick="showQuiz('francais-figures')">Figures</button>
+    </div>
+    <div id="sn-subnav" class="sub-navbar">
+      <button class="sub-nav-button" onclick="showQuiz('sn-architecture')">Arch & OS</button>
+      <button class="sub-nav-button" onclick="showQuiz('sn-reseau')">Réseaux & IP</button>
+      <button class="sub-nav-button" onclick="showQuiz('sn-embarque')">Embarqué</button>
+      <button class="sub-nav-button" onclick="showQuiz('sn-cyber')">Cybersécu</button>
+    </div>
   </div>
 
   <!-- Mobile drawer -->
-  <button class="nav-toggle" aria-label="Menu mobile">☰</button>
+  <button class="nav-toggle" aria-label="Ouvrir le menu">☰</button>
   <div class="overlay"></div>
   <nav class="drawer">
     <ul>
@@ -214,9 +239,7 @@
         </ul>
       </li>
       <li><a>EMC</a>
-        <ul>
-          <li><a onclick="selectAndClose('emc-theme1')">Bioéthique</a></li>
-        </ul>
+        <ul><li><a onclick="selectAndClose('emc-theme1')">Bioéthique</a></li></ul>
       </li>
       <li><a>Français</a>
         <ul>
@@ -235,13 +258,12 @@
     </ul>
   </nav>
 
-  <!-- Welcome -->
-  <div id="welcome-message" style="text-align:center;padding:2rem;margin-top:5rem;">
-    <h1>Quiz de Révision Interactif</h1>
-    <p>Bienvenue sur votre espace de révisions du Bac : consolidez vos connaissances grâce à nos quiz interactifs !</p>
+  <!-- Welcome message -->
+  <div id="welcome-message" style="text-align:center; padding:2rem; margin-top:5rem;">
+    <h1>Bienvenue sur votre espace de révisions du Bac Pro SN et autres matières !</h1>
   </div>
 
-  <!-- Quiz area -->
+  <!-- Quiz containers -->
   <div class="container" id="quiz-content-area">
     <div id="histoire-theme1-quiz" class="quiz-container"></div>
     <div id="histoire-theme2-quiz" class="quiz-container"></div>
@@ -256,12 +278,13 @@
     <div id="sn-cyber-quiz" class="quiz-container"></div>
   </div>
 
+  <!-- Footer -->
   <footer>
     <p>© 2025 Révisions SN RISC — par Pascal</p>
   </footer>
 
   <script>
-    /* Toggle desktop subnav */
+    // Toggle desktop submenus
     function toggleSub(id) {
       document.querySelectorAll('.sub-navbar').forEach(nav=>{
         nav.id===id ? nav.classList.toggle('active') : nav.classList.remove('active');
@@ -416,164 +439,182 @@
         ]
       },
       'sn-architecture': {
-        title: "Bac Pro SN - Architecture & OS",
-        questions: [
-          { q: "Quel composant exécute les instructions ?", o: ["RAM","SSD","CPU","GPU"], a: "c" },
-          { q: "Quelle mémoire est volatile ?", o: ["ROM","EEPROM","RAM","Flash"], a: "c" },
-          { q: "Stockage le plus rapide ?", o: ["HDD","CD-ROM","SSD NVMe","USB"], a: "c" },
-          { q: "Rôle du BIOS ?", o: ["Lancer OS","Config réseau","Init matos","Gérer fichiers"], a: "c" },
-          { q: "UEFI signifie ?", o: ["Universal EFI","Unified Extensible Firmware Interface","Ultra Easy FI","User EFI"], a: "b" },
-          { q: "Interface disque dur ?", o: ["USB","PCI","SATA","HDMI"], a: "c" },
-          { q: "Bus capteurs I2C ?", o: ["PCI","SATA","USB","I2C"], a: "d" },
-          { q: "OS en CLI ?", o: ["Windows","Linux","MacOS","Android"], a: "b" },
-          { q: "Commande lister fichiers ?", o: ["cd","ls","rm","ps"], a: "b" },
-          { q: "Mode accès total ?", o: ["Utilisateur","Noyau","Safe","UEFI"], a: "b" }
-        ]
-      },
+        title:"Bac Pro SN – Architecture & OS", questions:[
+        {q:"Quel composant exécute les instructions ?",o:["RAM","SSD","CPU","GPU"],a:"c"},
+        {q:"Quelle mémoire est volatile ?",o:["ROM","EEPROM","RAM","Flash"],a:"c"},
+        {q:"Quel stockage est le plus rapide ?",o:["HDD","CD-ROM","SSD NVMe","USB"],a:"c"},
+        {q:"Quel est le rôle du BIOS ?",o:["Lancer OS","Config réseau","Init matos","Gérer fichiers"],a:"c"},
+        {q:"UEFI signifie ?",o:["Universal EFI","Unified Extensible Firmware Interface","Ultra Easy FI","User EFI"],a:"b"},
+        {q:"Interface pour disque dur ?",o:["USB","PCI","SATA","HDMI"],a:"c"},
+        {q:"Bus utilisé pour I2C ?",o:["PCI","SATA","USB","I2C"],a:"d"},
+        {q:"Quel bus gère la carte graphique ?",o:["USB","PCIe","SATA","Ethernet"],a:"b"},
+        {q:"Firmware stocké dans ?",o:["RAM","ROM","Cache","VRAM"],a:"b"},
+        {q:"DDR5 est plus rapide que ?",o:["DDR2","DDR3","DDR4","DDR5"],a:"c"},
+        {q:"Registre d’adresse se trouve dans ?",o:["CPU","RAM","GPU","ROM"],a:"a"},
+        {q:"Architecture RISC typique ?",o:["x86","ARM","CISC","MIPS"],a:"b"},
+        {q:"Cache L1 a typiquement ?",o:["128 kB","256 MB","10 GB","1 TB"],a:"a"},
+        {q:"Overclocking modifie ?",o:["Fréquence CPU","Taille RAM","Capacité HDD","Température"],a:"a"},
+        {q:"GPT remplace ?",o:["MBR","NTFS","FAT32","EXT4"],a:"a"}
+      ]},
       'sn-reseau': {
-        title: "Bac Pro SN - Réseaux & IP",
-        questions: [
-          { q: "Couches du modèle OSI ?", o: ["4","5","6","7"], a: "d" },
-          { q: "Couche IP appartient ?", o: ["Liaison","Réseau","Transport","Applica"], a: "b" },
-          { q: "IP privée IPv4 exemple ?", o: ["192.168.0.1","8.8.8.8","172.0.0.1","255.255.255.0"], a: "a" },
-          { q: "Transfert sécurisé de fichier ?", o: ["FTP","SCP","SFTP","HTTP"], a: "c" },
-          { q: "Matériel pour commutation ?", o: ["Routeur","Switch","Modem","Firewall"], a: "b" },
-          { q: "Protocole port 443 ?", o: ["HTTP","HTTPS","FTP","SSH"], a: "b" },
-          { q: "Norme Wi-Fi la plus récente ?", o: ["802.11g","802.11n","802.11ac","802.11ax"], a: "d" },
-          { q: "Utilité masque sous-réseau ?", o: ["Ports","Diviser réseau","Sécurité","VLAN"], a: "b" },
-          { q: "Protocole DHCP ?", o: ["DNS","SSH","DHCP","ICMP"], a: "c" },
-          { q: "Protocole DNS fait… ?", o: ["FTP","DHCP","DNS","ARP"], a: "c" }
-        ]
-      },
+        title:"Bac Pro SN – Réseaux & IP", questions:[
+        {q:"Combien de couches dans OSI ?",o:["4","5","6","7"],a:"d"},
+        {q:"Couche IP appartient ?",o:["Liaison","Réseau","Transport","Application"],a:"b"},
+        {q:"Ex. IP privée ?",o:["192.168.0.1","8.8.8.8","172.0.0.1","255.255.255.255"],a:"a"},
+        {q:"Transfert sécurisé ?",o:["FTP","SCP","SFTP","HTTP"],a:"c"},
+        {q:"Switch opère en couche ?",o:["1","2","3","4"],a:"b"},
+        {q:"Protocole port 443 ?",o:["HTTP","HTTPS","FTP","SSH"],a:"b"},
+        {q:"Norme Wi-Fi la plus récente ?",o:["802.11g","802.11n","802.11ac","802.11ax"],a:"d"},
+        {q:"Masque /24 = ?",o:["255.0.0.0","255.255.0.0","255.255.255.0","255.255.255.255"],a:"c"},
+        {q:"DHCP sert à ?",o:["DNS","SSH","DHCP","ICMP"],a:"c"},
+        {q:"DNS sert à ?",o:["Résolution noms","Attribution MAC","Scan ports","Sécurisation"],a:"a"},
+        {q:"CIDR /16 = ?",o:["255.255.0.0","255.0.0.0","255.255.255.0","255.255.255.255"],a:"a"},
+        {q:"NAT permet ?",o:["Masquer IP","Augmenter RAM","Chiffrer","Stocker"],a:"a"},
+        {q:"VLAN segmentation en couche ?",o:["1","2","3","4"],a:"b"},
+        {q:"Ping utilise ?",o:["TCP","UDP","ICMP","HTTP"],a:"c"},
+        {q:"Traceroute utilise ?",o:["DNS","ICMP","ARP","BGP"],a:"b"}
+      ]},
       'sn-embarque': {
-        title: "Bac Pro SN - Systèmes Embarqués",
-        questions: [
-          { q: "Qu’est-ce qu’un microcontrôleur ?", o: ["CPU+RAM intégrées","Disque dur","Alim","Écran"], a: "a" },
-          { q: "Microcontrôleur IoT ?", o: ["Arduino","ESP32","Raspberry Pi","Intel i5"], a: "b" },
-          { q: "Pins numériques ?", o: ["ADC","PWM","GPIO","I2C"], a: "c" },
-          { q: "Protocole rapide 4 fils ?", o: ["UART","SPI","I2C","Wi-Fi"], a: "b" },
-          { q: "Langage Arduino ?", o: ["Python","Bash","C/C++","Java"], a: "c" },
-          { q: "Capteur température populaire ?", o: ["PIR","DHT11","LDR","L298N"], a: "b" },
-          { q: "Protocole IoT ?", o: ["MQTT","FTP","NTP","SMTP"], a: "a" },
-          { q: "Convertisseur augmente tension ?", o: ["Buck","Boost","Linéaire","EEPROM"], a: "b" },
-          { q: "Outil lire valeur analogique ?", o: ["PWM","ADC","DAC","UART"], a: "b" },
-          { q: "IDE Python ESP32 ?", o: ["Arduino","PyCharm","Thonny","MicroPython"], a: "d" }
-        ]
-      },
+        title:"Bac Pro SN – Systèmes Embarqués", questions:[
+        {q:"Qu’est-ce qu’un microcontrôleur ?",o:["CPU+RAM","Disque dur","Alim","Écran"],a:"a"},
+        {q:"MC pour IoT ?",o:["Arduino","ESP32","Pi Zero","Intel i5"],a:"b"},
+        {q:"Broche numérique ?",o:["ADC","PWM","GPIO","UART"],a:"c"},
+        {q:"Protocole rapide 4 fils ?",o:["UART","SPI","I2C","CAN"],a:"b"},
+        {q:"Langage Arduino ?",o:["Python","Bash","C/C++","Java"],a:"c"},
+        {q:"Capteur température ?",o:["PIR","DHT11","LDR","BMP180"],a:"b"},
+        {q:"Protocole IoT ?",o:["MQTT","FTP","NTP","SMTP"],a:"a"},
+        {q:"Convertisseur tension ?",o:["Buck","Boost","Linéaire","None"],a:"b"},
+        {q:"ADC convertit ?",o:["Analog→Num","Num→Analog","Digital→PWM","PWM→Analog"],a:"a"},
+        {q:"PWM sert à ?",o:["Lire capteur","Contrôler moteur","Stocker","Communiquer"],a:"b"},
+        {q:"I2C utilise ?",o:["4 fils","3 fils","2 fils","1 fil"],a:"c"},
+        {q:"SPI utilise ?",o:["2 fils","3 fils","4 fils","1 fil"],a:"c"},
+        {q:"UART signifie ?",o:["Universal A/B","Universal Async RC","User Arg Bus","Unique Bus"],a:"b"},
+        {q:"IDE Python micro ?",o:["Arduino","Thonny","VSCode","PyCharm"],a:"b"},
+        {q:"MicroPython tourne sur ?",o:["ESP32","Dell PC","Pi 3","Android"],a:"a"}
+      ]},
       'sn-cyber': {
-        title: "Bac Pro SN - Cybersécurité",
-        questions: [
-          { q: "Logiciel chiffre fichiers pour rançon ?", o: ["Spyware","Trojan","Ransomware","Worm"], a: "c" },
-          { q: "Protocole chiffrement web ?", o: ["HTTP","FTP","TLS","ICMP"], a: "c" },
-          { q: "Ex attaque réseau ?", o: ["SQL","DDoS","XSS","Hash"], a: "b" },
-          { q: "Outil analyse trames ?", o: ["Wireshark","Antivirus","Nmap","Traceroute"], a: "a" },
-          { q: "Protocole VPN ?", o: ["DNS","IPSec","SMTP","DHCP"], a: "b" },
-          { q: "Système détecte intrusion ?", o: ["UEFI","RAID","IDS","ACL"], a: "c" },
-          { q: "Mot de passe sûr ?", o: ["Court","Identique","Long&Unique","Nom famille"], a: "c" },
-          { q: "Chiffrement 2 clés ?", o: ["Symétrique","Asymétrique","Hash","AES"], a: "b" },
-          { q: "Phishing = ?", o: ["Analyse","Simulation","Usurpation identité","Privé"], a: "c" },
-          { q: "RGPD = ?", o: ["Réseau Privé","Règlement Gén. Protection Données","Réseau Prot.","Règle Protocoles"], a: "b" }
-        ]
+        title:"Bac Pro SN – Cybersécurité", questions:[
+        {q:"Logiciel chiffre rançon ?",o:["Spyware","Trojan","Ransomware","Worm"],a:"c"},
+        {q:"Protocole web chiffré ?",o:["HTTP","FTP","TLS","ICMP"],a:"c"},
+        {q:"Ex attaque réseau ?",o:["SQLi","DDoS","XSS","MITM"],a:"b"},
+        {q:"Outil analyse trames ?",o:["Wireshark","Nmap","ACL","SCP"],a:"a"},
+        {q:"Protocole VPN ?",o:["DNS","IPSec","SMTP","DHCP"],a:"b"},
+        {q:"IDS sert à ?",o:["Bloquer spam","Scanner ports","Détecter intrusion","Mesurer latence"],a:"c"},
+        {q:"Mot de passe sûr ?",o:["Court","Long&Unique","Simple","Identique"],a:"b"},
+        {q:"Chiffrement 2 clés ?",o:["Symétrique","Asymétrique","Hash","None"],a:"b"},
+        {q:"Phishing = ?",o:["Usurpation identité","Vol de données","DoS","Injection"],a:"a"},
+        {q:"RGPD signifie ?",o:["Règlement Général sur la Protection des Données","Réseau Global Prot.","Rules","None"],a:"a"},
+        {q:"2FA = ?",o:["Two-Factor Auth","Three-Factor","Fast Auth","No Auth"],a:"a"},
+        {q:"Honeypot sert à ?",o:["Piéger hackers","Bloquer virus","Chiffrer","Stocker"],a:"a"},
+        {q:"XSS attaque ?",o:["Injection JS","Injection SQL","Overflow","DoS"],a:"a"},
+        {q:"MD5 est ?",o:["Chiffrement","Hachage","Compression","Encodage"],a:"b"},
+        {q:"TLS remplace ?",o:["SSL","IPSec","SSH","None"],a:"a"}
       }
     };
 
-     // Construction dynamique des quiz
-    function buildQuizzes(){
-      for(let id in quizData){
-        const cont=document.getElementById(id+'-quiz'),
-              data=quizData[id];
-        let html=`<h2 class="quiz-title">${data.title}</h2>
-                  <form id="${id}-form" class="questions">`;
-        data.questions.forEach((q,i)=>{
-          const name=`${id}-q${i+1}`;
-          html+=`<div class="question-block">
-                    <p class="question-text">${i+1}. ${q.q}</p>
-                    <div class="options">`;
-          ['a','b','c','d'].forEach(l=>{
-            const idx=l.charCodeAt(0)-97;
-            if(q.o[idx]!==undefined) html+=
-              `<input type="radio" id="${name}-${l}" name="${name}" value="${l}">
-               <label for="${name}-${l}">${l}) ${q.o[idx]}</label>`;
+    // Build all quizzes
+    function buildQuizzes() {
+      for (let id in quizData) {
+        const cont = document.getElementById(id + '-quiz'),
+              data = quizData[id];
+        let html = `<h2 class="quiz-title">${data.title}</h2>
+                    <form id="${id}-form" class="questions">`;
+        data.questions.forEach((q,i) => {
+          const name = `${id}-q${i+1}`;
+          html += `<div class="question-block">
+                     <p class="question-text">${i+1}. ${q.q}</p>
+                     <div class="options">`;
+          ['a','b','c','d'].forEach(l => {
+            const idx = l.charCodeAt(0) - 97;
+            if (q.o[idx] !== undefined) {
+              html += `<input type="radio" id="${name}-${l}" name="${name}" value="${l}">
+                       <label for="${name}-${l}">${l}) ${q.o[idx]}</label>`;
+            }
           });
-          html+=`</div></div>`;
+          html += `</div></div>`;
         });
-        html+=`<button type="button" class="submit-quiz-button" onclick="submitQuiz('${id}')">
-                  Valider le Quiz
-                </button>
-                <div id="${id}-results" class="results-display" style="display:none;"></div>
-                </form>`;
-        cont.innerHTML=html;
+        html += `<button type="button" class="submit-quiz-button" onclick="submitQuiz('${id}')">Valider le Quiz</button>
+                 <div id="${id}-results" class="results-display" style="display:none;"></div>
+                 </form>`;
+        cont.innerHTML = html;
       }
     }
-    function showQuiz(id){
-      document.getElementById('welcome-message').style.display='none';
-      document.querySelectorAll('.quiz-container').forEach(c=>c.classList.remove('active'));
-      document.getElementById(id+'-quiz').classList.add('active');
-      window.scrollTo({top:0,behavior:'smooth'});
+
+    function showQuiz(id) {
+      document.getElementById('welcome-message').style.display = 'none';
+      document.querySelectorAll('.quiz-container').forEach(c => c.classList.remove('active'));
+      document.getElementById(id + '-quiz').classList.add('active');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    /* Mobile drawer */
-    const drawer=document.querySelector('nav.drawer'),
-          overlay=document.querySelector('.overlay'),
-          toggleBtn=document.querySelector('.nav-toggle');
-    toggleBtn.addEventListener('click',()=>{
+    // Mobile drawer handling
+    const drawer = document.querySelector('nav.drawer'),
+          overlay = document.querySelector('.overlay'),
+          toggle  = document.querySelector('.nav-toggle');
+    toggle.addEventListener('click', () => {
       drawer.classList.toggle('open');
       overlay.classList.toggle('show');
     });
-    overlay.addEventListener('click',()=>{
+    overlay.addEventListener('click', () => {
       drawer.classList.remove('open');
       overlay.classList.remove('show');
     });
-    document.querySelectorAll('nav.drawer > ul > li > a').forEach(a=>{
-      a.addEventListener('click',e=>{
+    document.querySelectorAll('nav.drawer > ul > li > a').forEach(a => {
+      a.addEventListener('click', e => {
         e.preventDefault();
-        const li=a.parentNode;
+        const li = a.parentNode;
         li.classList.toggle('open');
         document.querySelectorAll('nav.drawer > ul > li')
-                .forEach(other=>{ if(other!==li) other.classList.remove('open'); });
+                .forEach(other => { if (other !== li) other.classList.remove('open'); });
       });
     });
-    function selectAndClose(id){
+    function selectAndClose(id) {
       showQuiz(id);
       drawer.classList.remove('open');
       overlay.classList.remove('show');
     }
 
-    /* Submit & feedback */
-    function submitQuiz(id){
-      const data=quizData[id],
-            form=document.getElementById(id+'-form'),
-            res=document.getElementById(id+'-results');
-      let score=0, total=data.questions.length;
-      form.querySelectorAll('.feedback').forEach(f=>f.remove());
-      data.questions.forEach((q,i)=>{
-        const name=`${id}-q${i+1}`,
-              sel=form.querySelector(`input[name="${name}"]:checked`),
-              block=form.querySelector(`input[name="${name}"]`).closest('.question-block'),
-              fb=document.createElement('div');
+    // Submit quiz & feedback
+    function submitQuiz(id) {
+      const data = quizData[id],
+            form = document.getElementById(id + '-form'),
+            res  = document.getElementById(id + '-results');
+      let score = 0, total = data.questions.length;
+      form.querySelectorAll('.feedback').forEach(f => f.remove());
+      data.questions.forEach((q,i) => {
+        const name = `${id}-q${i+1}`,
+              sel  = form.querySelector(`input[name="${name}"]:checked`),
+              block= form.querySelector(`input[name="${name}"]`).closest('.question-block'),
+              fb   = document.createElement('div');
         fb.classList.add('feedback');
-        if(sel && sel.value===q.a){
-          score++; fb.textContent='✓ Correct'; fb.classList.add('correct-answer-feedback');
+        if (sel && sel.value === q.a) {
+          score++;
+          fb.textContent = '✓ Correct';
+          fb.classList.add('correct-answer-feedback');
         } else {
-          const idx=q.a.charCodeAt(0)-97;
-          fb.innerHTML=`✗ Incorrect : <strong>${q.a.toUpperCase()}) ${q.o[idx]}</strong>`;
+          const idx = q.a.charCodeAt(0) - 97;
+          fb.innerHTML = `✗ Incorrect : <strong>${q.a.toUpperCase()}) ${q.o[idx]}</strong>`;
           fb.classList.add('incorrect-answer-feedback');
         }
         block.appendChild(fb);
       });
-      const pct=score/total,
-            msg=`Votre score : ${score}/${total}. `+
-                (pct===1?'🎉 Sans faute !':pct>=0.7?'👍 Très bon !':pct>=0.5?'😊 Pas mal':'💪 À revoir'),
-            sug=pct<0.5?'Revoir le thème puis ':'Relire puis ';
-      res.innerHTML=`<p>${msg}</p>
-                     <p class="feedback">${sug}
-                       <a href="#" onclick="showQuiz('${id}')">reprendre le quiz</a>.
-                     </p>`;
-      res.style.display='block';
-      res.scrollIntoView({behavior:'smooth'});
+      const pct = score/total,
+            msg = `Votre score : ${score}/${total}. ` +
+                  (pct===1 ? '🎉 Sans faute !' :
+                   pct>=0.7 ? '👍 Très bon !' :
+                   pct>=0.5 ? '😊 Pas mal' :
+                              '💪 À revoir'),
+            sug = pct<0.5 ? 'Revoir le thème puis ' : 'Relire puis ';
+      res.innerHTML = `<p>${msg}</p>
+                       <p class="feedback">${sug}
+                         <a href="#" onclick="showQuiz('${id}')">reprendre le quiz</a>.
+                       </p>`;
+      res.style.display = 'block';
+      res.scrollIntoView({ behavior: 'smooth' });
     }
 
-    document.addEventListener('DOMContentLoaded',buildQuizzes);
+    // Initialize
+    document.addEventListener('DOMContentLoaded', buildQuizzes);
   </script>
 </body>
 </html>
