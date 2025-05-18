@@ -15,46 +15,64 @@
       line-height: 1.6;
     }
 
-    /* ----------- NAVBAR ----------- */
-    .navbar {
-      display: flex; overflow-x: auto; white-space: nowrap;
-      background-color: #2d3748; padding: 10px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    /* ----------- NAVBAR & MENU DÉROULANT ----------- */
+    nav.navbar {
+      background: #2d3748;
       position: sticky; top: 0; z-index: 1000;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
-    .nav-button {
-      flex: 0 0 auto;
-      margin-right: 8px;
+    .menu {
+      display: flex; overflow-x: auto; white-space: nowrap;
+      list-style: none; padding: 0 10px;
+    }
+    .menu-item {
+      position: relative;
+      margin-right: 12px;
       padding: 8px 16px;
-      background: #4a5568; color: #e2e8f0;
-      border: none; border-radius: 5px;
-      font-size: 15px; cursor: pointer;
+      color: #e2e8f0;
+      cursor: pointer;
       transition: background 0.3s;
     }
-    .nav-button.active,
-    .nav-button:hover {
-      background: #63b3ed; color: #1a202c;
+    .menu-item:hover {
+      background: #4a5568;
     }
-
-    /* ----------- SUBNAVBAR ----------- */
-    .sub-navbar {
-      display: none;
+    .submenu {
+      position: absolute;
+      top: 100%; left: 0;
       background: #222a38;
-      padding: 8px;
-      justify-content: center; flex-wrap: wrap;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+      list-style: none;
+      padding: 8px 0;
+      margin-top: 4px;
+      border-radius: 4px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      opacity: 0;
+      transform: translateY(-10px);
+      pointer-events: none;
+      transition: opacity 0.25s ease, transform 0.25s ease;
+    }
+    .menu-item:hover .submenu {
+      opacity: 1;
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+    .submenu li {
+      padding: 0;
     }
     .sub-nav-button {
-      margin: 4px;
-      padding: 6px 12px;
-      background: #3b4759; color: #cbd5e0;
-      border: none; border-radius: 4px;
-      font-size: 14px; cursor: pointer;
-      transition: background 0.3s;
+      display: block;
+      width: 100%;
+      padding: 8px 20px;
+      background: none;
+      color: #cbd5e0;
+      border: none;
+      text-align: left;
+      font-size: 14px;
+      cursor: pointer;
+      transition: background 0.2s;
     }
-    .sub-nav-button.active,
     .sub-nav-button:hover {
-      background: #5289b3; color: #e2e8f0;
+      background: #3b4759;
+      color: #e2e8f0;
     }
 
     /* ----------- WELCOME ----------- */
@@ -220,36 +238,46 @@
 <body>
 
   <!-- NAVIGATION PRINCIPALE -->
-  <div class="navbar">
-    <button class="nav-button" onclick="showSubNavbar('histoire-subnav')">Histoire 🟥</button>
-    <button class="nav-button" onclick="showSubNavbar('geographie-subnav')">Géographie 🟦</button>
-    <button class="nav-button" onclick="showSubNavbar('emc-subnav')">EMC 🟨</button>
-    <button class="nav-button" onclick="showSubNavbar('francais-subnav')">Français 🟥🟦</button>
-    <button class="nav-button" onclick="showSubNavbar('sn-subnav')">Bac Pro SN 🟩</button>
-  </div>
-
-  <!-- SOUS-MENU -->
-  <div id="histoire-subnav" class="sub-navbar">
-    <button class="sub-nav-button" onclick="showQuiz('histoire-theme1')">Guerre Froide</button>
-    <button class="sub-nav-button" onclick="showQuiz('histoire-theme2')">Décolonisation</button>
-  </div>
-  <div id="geographie-subnav" class="sub-navbar">
-    <button class="sub-nav-button" onclick="showQuiz('geographie-theme1')">Ressources & DD</button>
-    <button class="sub-nav-button" onclick="showQuiz('geographie-theme2')">Risques</button>
-  </div>
-  <div id="emc-subnav" class="sub-navbar">
-    <button class="sub-nav-button" onclick="showQuiz('emc-theme1')">Bioéthique</button>
-  </div>
-  <div id="francais-subnav" class="sub-navbar">
-    <button class="sub-nav-button" onclick="showQuiz('francais-oeuvres')">Œuvres étudiées</button>
-    <button class="sub-nav-button" onclick="showQuiz('francais-figures')">Figures de style</button>
-  </div>
-  <div id="sn-subnav" class="sub-navbar">
-    <button class="sub-nav-button" onclick="showQuiz('sn-architecture')">Architecture & OS</button>
-    <button class="sub-nav-button" onclick="showQuiz('sn-reseau')">Réseaux & IP</button>
-    <button class="sub-nav-button" onclick="showQuiz('sn-embarque')">Embarqué</button>
-    <button class="sub-nav-button" onclick="showQuiz('sn-cyber')">Cybersécurité</button>
-  </div>
+  <nav class="navbar">
+    <ul class="menu">
+      <li class="menu-item">
+        Histoire 🟥
+        <ul class="submenu">
+          <li><button class="sub-nav-button" onclick="showQuiz('histoire-theme1')">Guerre Froide</button></li>
+          <li><button class="sub-nav-button" onclick="showQuiz('histoire-theme2')">Décolonisation</button></li>
+        </ul>
+      </li>
+      <li class="menu-item">
+        Géographie 🟦
+        <ul class="submenu">
+          <li><button class="sub-nav-button" onclick="showQuiz('geographie-theme1')">Ressources & DD</button></li>
+          <li><button class="sub-nav-button" onclick="showQuiz('geographie-theme2')">Risques</button></li>
+        </ul>
+      </li>
+      <li class="menu-item">
+        EMC 🟨
+        <ul class="submenu">
+          <li><button class="sub-nav-button" onclick="showQuiz('emc-theme1')">Bioéthique</button></li>
+        </ul>
+      </li>
+      <li class="menu-item">
+        Français 🟥🟦
+        <ul class="submenu">
+          <li><button class="sub-nav-button" onclick="showQuiz('francais-oeuvres')">Œuvres étudiées</button></li>
+          <li><button class="sub-nav-button" onclick="showQuiz('francais-figures')">Figures de style</button></li>
+        </ul>
+      </li>
+      <li class="menu-item">
+        Bac Pro SN 🟩
+        <ul class="submenu">
+          <li><button class="sub-nav-button" onclick="showQuiz('sn-architecture')">Architecture & OS</button></li>
+          <li><button class="sub-nav-button" onclick="showQuiz('sn-reseau')">Réseaux & IP</button></li>
+          <li><button class="sub-nav-button" onclick="showQuiz('sn-embarque')">Embarqué</button></li>
+          <li><button class="sub-nav-button" onclick="showQuiz('sn-cyber')">Cybersécurité</button></li>
+        </ul>
+      </li>
+    </ul>
+  </nav>
 
   <!-- MESSAGE DE BIENVENUE -->
   <div id="welcome-message">
@@ -331,7 +359,7 @@
           { q: "Ressource mal répartie mondialement ?", o:["Pétrole","Charbon","Eau","Gaz"], a:"c" },
           { q: "Fleuve source de tensions (7 pays) ?", o:["Nil","Amazone","Colorado","Yangzi"], a:"a" },
           { q: "Agriculture la plus durable ?", o:["Intensive","Monoculture","Agroécologie","Hydroponie"], a:"c" },
-          { q: "Sécurité alimentaire vise à ?", o:["Exporter","Réduire coûts","Accès équitable","OGM"], a:"c" },
+          { q: "Sécurité alimentaire vise à ?", o:["Exporter","Réduire coûts","Accès équitable","Développer OGM"], a:"c" },
           { q: "Phénomène aggravant la faim ?", o:["Déflation","Réchauffement","Surpopulation","Pandémies"], a:"b" },
           { q: "Virus illustrant lien santé-environnement ?", o:["Ebola","VIH","Covid-19","Grippe espagnole"], a:"c" },
           { q: "Plantes économisant l’eau ?", o:["Cactus","Tropicales","Peu gourmandes","Céréales"], a:"a" },
@@ -373,12 +401,12 @@
           { q: "GPA autorisée en France ?", o:["Oui","Non","Hétéros","Etranger"], a:"b" },
           { q: "Bioéthique étudie ?", o:["Écosystèmes","Modification vivant","Animaux","Agri"], a:"b" },
           { q: "COP sert à ?", o:["Pandémies","Commerce","Climat","Tourisme"], a:"c" },
-          { q: "Exemple coop climat ?", o:["OTAN","Paris","G20","UNESCO"], a:"b" },
-          { q: "Détox numérique est un ?", o:["Hash","Hashtag","Mouvement","Produit"], a:"c" },
+          { q: "Ex coop climat ?", o:["OTAN","Paris","G20","UNESCO"], a:"b" },
+          { q: "Détox numérique ?", o:["Hash","Hashtag","Mouvement","Produit"], a:"c" },
           { q: "Enjeu bioéthique ?", o:["Scientifique","Droits équilibre","Éco","Animaux"], a:"b" },
           { q: "RGPD protège ?", o:["Réseau","Données persos","Protocoles","Énergie"], a:"b" },
           { q: "2FA signifie ?", o:["Double Auth","Small Auth","Two Flags","Check Four"], a:"a" },
-          { q: "Clonage thérapeutique autorisé ?", o:["Oui","Non","Sous cond","Expertise"], a:"b" },
+          { q: "Clonage thérapeutique autorisé ?", o:["Oui","Non","Sous cond.","Expertise"], a:"b" },
           { q: "Cellules souches issues de ?", o:["Sang","Embryon","Peau","Graisse"], a:"b" },
           { q: "Débat fin de vie concerne ?", o:["Techno","Éthique","Éco","Sport"], a:"b" }
         ]
@@ -435,8 +463,8 @@
           { q: "Bus I²C pour capteurs ?", o:["PCI","SATA","USB","I2C"], a:"d" },
           { q: "OS en CLI ?", o:["Windows","Linux","MacOS","Android"], a:"b" },
           { q: "Commande liste fichiers ?", o:["cd","ls","rm","ps"], a:"b" },
-          { q: "Mode avec accès complet ?", o:["User Mode","Kernel Mode","Safe Mode","UEFI Mode"], a:"b" },
-          { q: "Quel registre stocke l’adresse de saut ?", o:["EIP","ESP","EBP","EDI"], a:"a" },
+          { q: "Mode accès complet ?", o:["User Mode","Kernel Mode","Safe Mode","UEFI Mode"], a:"b" },
+          { q: "Registre saut ?", o:["EIP","ESP","EBP","EDI"], a:"a" },
           { q: "CISC vs RISC ?", o:["Complexe/op","Simple/op","Cher/bon","Lent/rapide"], a:"b" },
           { q: "Bootloader logé en ?", o:["RAM","ROM","Disque","Flash"], a:"b" },
           { q: "Bus GPU moderne ?", o:["PCIe","USB","SATA","I2C"], a:"a" },
@@ -446,61 +474,61 @@
       'sn-reseau': {
         title: "Bac Pro SN – Réseaux & IP",
         questions: [
-          { q: "Couches du modèle OSI ?", o:["4","5","6","7"], a:"d" },
-          { q: "Couche de l’adressage IP ?", o:["Liaison","Réseau","Transport","App"], a:"b" },
+          { q: "Couches modèle OSI ?", o:["4","5","6","7"], a:"d" },
+          { q: "Couche adressage IP ?", o:["Liaison","Réseau","Transport","App"], a:"b" },
           { q: "Adresse privée ex. ?", o:["192.168.0.1","8.8.8.8","172.0.0.1","255.255.255.0"], a:"a" },
           { q: "FTP sécurisé ?", o:["FTP","SCP","SFTP","HTTP"], a:"c" },
-          { q: "Commutation assurée par ?", o:["Routeur","Switch","Modem","Firewall"], a:"b" },
+          { q: "Commutation par ?", o:["Routeur","Switch","Modem","Firewall"], a:"b" },
           { q: "Port HTTPS ?", o:["80","443","21","22"], a:"b" },
-          { q: "Norme Wi-Fi moderne ?", o:["g","n","ac","ax"], a:"d" },
-          { q: "Masque sous-réseau sert à ?", o:["Attribuer ports","Découper réseau","Sécuriser","Créer VLAN"], a:"b" },
-          { q: "DHCP attribue…", o:["IP","DNS","MAC","Port"], a:"a" },
-          { q: "DNS résout…", o:["IP→MAC","Nom→IP","Port→App","MAC→IP"], a:"b" },
+          { q: "Norme Wi-Fi ?", o:["g","n","ac","ax"], a:"d" },
+          { q: "Masque sert à ?", o:["Ports","Découper","Sécuriser","VLAN"], a:"b" },
+          { q: "DHCP attribue ?", o:["IP","DNS","MAC","Port"], a:"a" },
+          { q: "DNS résout ?", o:["IP→MAC","Nom→IP","Port→App","MAC→IP"], a:"b" },
           { q: "TCP signifie ?", o:["Transmit…","Transmission Control Protocol","Transport Control Protocol","Transfer Connexion"], a:"b" },
-          { q: "UDP est…", o:["Fiable","Non fiable","Chiffré","Verrouillé"], a:"b" },
-          { q: "ARP sert à…", o:["IP→MAC","MAC→IP","Port→App","Nom→IP"], a:"a" },
+          { q: "UDP est ?", o:["Fiable","Non fiable","Chiffré","Verrouillé"], a:"b" },
+          { q: "ARP sert ?", o:["IP→MAC","MAC→IP","Port→App","Nom→IP"], a:"a" },
           { q: "SSH port ?", o:["23","22","21","25"], a:"b" },
-          { q: "Email sécurisé ?", o:["SMTP","POP3","IMAP","TLS"], a:"d" }
+          { q: "Mail sécurisé ?", o:["SMTP","POP3","IMAP","TLS"], a:"d" }
         ]
       },
       'sn-embarque': {
         title: "Bac Pro SN – Systèmes Embarqués",
         questions: [
-          { q: "Qu’est-ce qu’un microcontrôleur ?", o:["Processeur+RAM","Disque dur","Alimentation","Écran"], a:"a" },
-          { q: "Microcontrôleur IoT ?", o:["Arduino","ESP32","Raspberry Pi","Intel i5"], a:"b" },
-          { q: "GPIO signifie…", o:["General Purpose I/O","Gigabit Pin","Group Pin","GPIO"], a:"a" },
-          { q: "SPI utilise…", o:["2 fils","3 fils","4 fils","5 fils"], a:"c" },
-          { q: "Langage Arduino IDE ?", o:["Python","Bash","C/C++","Java"], a:"c" },
-          { q: "DHT11 mesure…", o:["Mouvement","Température+Humidité","Lumière","Distance"], a:"b" },
-          { q: "IoT standard ?", o:["FTP","MQTT","SMTP","NTP"], a:"b" },
-          { q: "Boost converter…", o:["Diminue tension","Augmente tension","Lisse tension","Stocke énergie"], a:"b" },
-          { q: "ADC convertit…", o:["Num→Ana","Ana→Num","Digital→I2C","PWM→Ana"], a:"b" },
-          { q: "IDE Python pour ESP32 ?", o:["Arduino IDE","PyCharm","Thonny","MicroPython"], a:"d" },
-          { q: "PWM sert à…", o:["Lire analogique","Générer signal varié","Filtrer bruit","Stocker données"], a:"b" },
-          { q: "CAN bus utilisé en…", o:["Auto","Réseau","Audio","Video"], a:"a" },
-          { q: "STM32 base architecturale…", o:["x86","ARM Cortex","MIPS","PowerPC"], a:"b" },
-          { q: "LoRa est un…", o:["Langage","Protocole IoT","MCU","Bus"], a:"b" },
-          { q: "Bootloader initialisation…", o:["RAM","Flash","EEPROM","SD"], a:"b" }
+          { q: "Microcontrôleur ?", o:["Processeur+RAM","Disque dur","Alim","Écran"], a:"a" },
+          { q: "IoT MCU ?", o:["Arduino","ESP32","Raspberry","Intel i5"], a:"b" },
+          { q: "GPIO signifie ?", o:["General Purpose I/O","Gigabit Pin","Group Pin","GPIO"], a:"a" },
+          { q: "SPI fils ?", o:["2","3","4","5"], a:"c" },
+          { q: "Langage Arduino ?", o:["Python","Bash","C/C++","Java"], a:"c" },
+          { q: "DHT11 mesure ?", o:["Mvt","Temp+Hum","Lumière","Distance"], a:"b" },
+          { q: "IoT protocole ?", o:["FTP","MQTT","SMTP","NTP"], a:"b" },
+          { q: "Boost converter ?", o:["Diminue","Augmente","Lisse","Stocke"], a:"b" },
+          { q: "ADC convertit ?", o:["Num→Ana","Ana→Num","Dig→I2C","PWM→Ana"], a:"b" },
+          { q: "IDE Python MCU ?", o:["Arduino","PyCharm","Thonny","MicroPython"], a:"d" },
+          { q: "PWM sert ?", o:["Lire ana","Gen sign","Filtrer","Stocker"], a:"b" },
+          { q: "CAN bus en ?", o:["Auto","Réseau","Audio","Vidéo"], a:"a" },
+          { q: "STM32 base ?", o:["x86","ARM","MIPS","PowerPC"], a:"b" },
+          { q: "LoRa est ?", o:["Langage","Protocole","MCU","Bus"], a:"b" },
+          { q: "Bootloader init ?", o:["RAM","Flash","EEPROM","SD"], a:"b" }
         ]
       },
       'sn-cyber': {
         title: "Bac Pro SN – Cybersécurité",
         questions: [
-          { q: "Ransomware fait…", o:["Espionner","Chiffrer+Rançon","Supprimer fichiers","Copier données"], a:"b" },
-          { q: "Web sécurisé par…", o:["HTTP","FTP","TLS","ICMP"], a:"c" },
-          { q: "DDoS attaque…", o:["SQL","DDoS","XSS","Hash"], a:"b" },
-          { q: "Analyser trames ?", o:["Wireshark","Antivirus","Nmap","Traceroute"], a:"a" },
-          { q: "VPN protocole…", o:["DNS","IPSec","SMTP","DHCP"], a:"b" },
-          { q: "IDS sert à…", o:["Boot","Stockage","Détection intrusion","Authentification"], a:"c" },
-          { q: "Mot de passe sécurisé ?", o:["Court","Long+Unique","Identique partout","Nom fam"], a:"b" },
-          { q: "Asymétrique utilise…", o:["1 clé","2 clés","Hash","IV"], a:"b" },
-          { q: "Phishing =…", o:["Scan vuln","Usurpation identité","Backup","Test réseau"], a:"b" },
-          { q: "RGPD protège ?", o:["Réseau","Données persos","Protocoles","Énergie"], a:"b" },
-          { q: "Rootkit est un…", o:["Virus","Outil détection","Kit masquant intrusion","Anti-malware"], a:"c" },
-          { q: "Honeypot sert à…", o:["Attirer hackers","Filtrer mails","Chiffrer disques","Stocker logs"], a:"a" },
-          { q: "PGP/GPG pour…", o:["Chats","Emails+Fichiers","Streaming","DNS"], a:"b" },
-          { q: "XSS attaque…", o:["SQL","JS inj","Overflow","Phishing"], a:"b" },
-          { q: "DMZ est une…", o:["Réseau interne","Zone démilitarisée","Protocole","Port"], a:"b" }
+          { q: "Ransomware fait ?", o:["Espionner","Chiffrer+rançon","Suppr fichiers","Copier"], a:"b" },
+          { q: "Web chiffré par ?", o:["HTTP","FTP","TLS","ICMP"], a:"c" },
+          { q: "DDoS attaque ?", o:["SQL","DDoS","XSS","Hash"], a:"b" },
+          { q: "Analyser trames ?", o:["Wireshark","Anti-malware","Nmap","Traceroute"], a:"a" },
+          { q: "VPN util…", o:["DNS","IPSec","SMTP","DHCP"], a:"b" },
+          { q: "IDS ?", o:["Boot","Stockage","Détection","Auth"], a:"c" },
+          { q: "MDP sécurisé ?", o:["Court","Long+Unique","Identique","Nomfam"], a:"b" },
+          { q: "Asymétrique ?", o:["1 clé","2 clés","Hash","IV"], a:"b" },
+          { q: "Phishing ?", o:["Scan vuln","Usurp ID","Backup","Test réseau"], a:"b" },
+          { q: "RGPD ?", o:["Réseau","Données persos","Proto","Énergie"], a:"b" },
+          { q: "Rootkit ?", o:["Virus","Détecteur","Masque intrusion","Anti-malware"], a:"c" },
+          { q: "Honeypot ?", o:["Attirer","Filtrer","Chiffrer","Stocker logs"], a:"a" },
+          { q: "PGP/GPG ?", o:["Chats","Emails+Fichiers","Streaming","DNS"], a:"b" },
+          { q: "XSS ?", o:["SQL","JS inj","Overflow","Phish"], a:"b" },
+          { q: "DMZ ?", o:["Interne","Démilitarisée","Protocole","Port"], a:"b" }
         ]
       }
     };
@@ -539,22 +567,12 @@
     }
     document.addEventListener('DOMContentLoaded', buildQuizzes);
 
-    // afficher le sous-menu
-    function showSubNavbar(id) {
-      document.querySelectorAll('.sub-navbar').forEach(el=>el.style.display='none');
-      document.querySelectorAll('.nav-button').forEach(b=>b.classList.remove('active'));
-      document.querySelector(`.nav-button[onclick="showSubNavbar('${id}')"]`)
-        .classList.add('active');
-      document.getElementById(id).style.display='flex';
-      window.scrollTo({top:0,behavior:'smooth'});
-    }
-
     // afficher un quiz
     function showQuiz(id) {
       document.getElementById('welcome-message').style.display='none';
       document.querySelectorAll('.quiz-container').forEach(c=>c.classList.remove('active'));
-      document.querySelectorAll('.sub-nav-button').forEach(b=>b.classList.remove('active'));
-      document.querySelector(`.sub-nav-button[onclick="showQuiz('${id}')"]`)
+      document.querySelectorAll('.submenu button').forEach(b=>b.classList.remove('active'));
+      document.querySelector(`.submenu button[onclick="showQuiz('${id}')"]`)
         .classList.add('active');
       document.getElementById(id+'-quiz').classList.add('active');
       window.scrollTo({top:0,behavior:'smooth'});
@@ -571,7 +589,7 @@
         const ans = sel ? sel.value : null;
         const block = sel
           ? sel.closest('.question-block')
-          : form.querySelector(`input[name="${name}"]`).closest('.question-block');
+          : form.querySelector(`input[name="${name}"]`).closest('.question-block`);
         const fb = document.createElement('p');
         fb.classList.add('feedback');
         if (ans === q.a) {
